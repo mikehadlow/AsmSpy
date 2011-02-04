@@ -35,6 +35,10 @@ namespace AsmSpy
                 return;
             }
 
+            Console.WriteLine("Check assemblies in:");
+            Console.WriteLine(directoryInfo.FullName);
+            Console.WriteLine("");
+
             var assemblies = new Dictionary<string, IList<ReferencedAssembly>>();
             foreach (var fileInfo in assemblyFiles)
             {
