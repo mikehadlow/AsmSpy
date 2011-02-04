@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsmSpy", "AsmSpy\AsmSpy.csproj", "{5ACC768B-F9F7-4472-9AB9-2543E32FD1ED}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{8BC4A19E-A009-4660-8777-02502196180C}"
+	ProjectSection(SolutionItems) = preProject
+		README.txt = README.txt
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5ACC768B-F9F7-4472-9AB9-2543E32FD1ED}.Debug|x86.ActiveCfg = Debug|x86
+		{5ACC768B-F9F7-4472-9AB9-2543E32FD1ED}.Debug|x86.Build.0 = Debug|x86
+		{5ACC768B-F9F7-4472-9AB9-2543E32FD1ED}.Release|x86.ActiveCfg = Release|x86
+		{5ACC768B-F9F7-4472-9AB9-2543E32FD1ED}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
