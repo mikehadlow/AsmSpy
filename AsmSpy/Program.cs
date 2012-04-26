@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -27,8 +28,8 @@ namespace AsmSpy
 
         public static void AnalyseAssemblies(DirectoryInfo directoryInfo)
         {
-            var assemblyFiles = directoryInfo.GetFiles("*.dll");
-            if (assemblyFiles.Length == 0)
+            var assemblyFiles = directoryInfo.GetFiles("*.dll").Concat(directoryInfo.GetFiles("*.exe"));
+            if (!assemblyFiles.Any())
             {
                 Console.WriteLine("No dll files found in directory: '{0}'", 
                     directoryInfo.FullName);
