@@ -6,10 +6,15 @@ How it works:
 Simply run AsmSpy giving it a path to your bin directory (the folder where your project's assemblies live).
 
 E.G:
+AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin all
+
+It will output a list of all the assemblies and assemblies referenced by your assemblies. You can look at the
+list to determine where versioining conflicts occur.
+
+E.G:
 AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin
 
-It will output a list of all the assemblies referenced by your assemblies. You can look at the
-list to determine where versioining conflicts occur.
+It will output a list of all assemblies and only conflicting assembly references.
  
 The output looks something like this:
 
