@@ -24,7 +24,7 @@ namespace AsmSpy
             }
 
 
-            var onlyConflicts = args.Length == 2 ? (args[1] != "all") : true;
+            var onlyConflicts = args.Length != 2 || (args[1] != "all");
 
             AnalyseAssemblies(new DirectoryInfo(directoryPath), onlyConflicts);
         }
