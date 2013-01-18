@@ -10,7 +10,7 @@ namespace AsmSpy
     {
         static void Main(string[] args)
         {
-            if (args.Length != 2 && args.Length != 1)
+            if (args.Length > 3 || args.Length < 1)
             {
                 PrintUsage();
                 return;
