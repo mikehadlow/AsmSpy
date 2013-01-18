@@ -24,12 +24,13 @@ namespace AsmSpy
             }
 
 
-            var onlyConflicts = args.Length != 2 || (args[1] != "all");
+            var onlyConflicts = !args.Skip(1).Any( x=> x.Equals("all", StringComparison.OrdinalIgnoreCase) );  // args.Length != 2 || (args[1] != "all");
+            var skipSystem = args.Skip(1).Any( x=> x.Equals("nonsystem", StringComparison.OrdinalIgnoreCase) ); 
 
-            AnalyseAssemblies(new DirectoryInfo(directoryPath), onlyConflicts);
+            AnalyseAssemblies(new DirectoryInfo(directoryPath), onlyConflicts, skipSystem);
         }
 
-        public static void AnalyseAssemblies(DirectoryInfo directoryInfo, bool onlyConflicts)
+        public static void AnalyseAssemblies(DirectoryInfo directoryInfo, bool onlyConflicts, bool skipSystem)
         {
             var assemblyFiles = directoryInfo.GetFiles("*.dll").Concat(directoryInfo.GetFiles("*.exe"));
             if (!assemblyFiles.Any())
@@ -73,13 +74,15 @@ namespace AsmSpy
 
             foreach (var assembly in assemblies)
             {
-                Console.WriteLine("Reference: {0}", assembly.Key);
+                if ( skipSystem && ( assembly.Key.StartsWith("System")|| assembly.Key.StartsWith("mscorlib") ) ) continue;
+                
 
                 IList<ReferencedAssembly> refAsm = new List<ReferencedAssembly>();
 
                 if (!onlyConflicts
                     || (onlyConflicts && assembly.Value.GroupBy(x => x.VersionReferenced).Count() != 1))
                 {
+                    Console.WriteLine("Reference: {0}", assembly.Key);
                     foreach (var referencedAssembly in assembly.Value)
                     {
                         Console.WriteLine("\t{0} by {1}", referencedAssembly.VersionReferenced, referencedAssembly.ReferencedBy.GetName().Name);
