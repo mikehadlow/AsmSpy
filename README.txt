@@ -5,12 +5,14 @@ A simple command line tool to view assembly references.
 How it works:
 Simply run AsmSpy giving it a path to your bin directory (the folder where your project's assemblies live).
 
-E.G:
-AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin
+    AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin
 
-It will output a list of all the assemblies referenced by your assemblies. You can look at the
-list to determine where versioining conflicts occur.
- 
+It will output a list of all conflicting assembly references. That is where different assemblies in your bin folder reference different versions of the same assembly.
+
+To see a list of all assemblies and all references, just add the 'all' flag:
+
+    AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin all
+
 The output looks something like this:
 
 ....
