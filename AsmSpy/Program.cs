@@ -8,6 +8,15 @@ namespace AsmSpy
 {
     public class Program
     {
+        static readonly ConsoleColor[] ConsoleColors = new ConsoleColor[]
+            {
+                ConsoleColor.Green,
+                ConsoleColor.Red,
+                ConsoleColor.Yellow,
+                ConsoleColor.Blue,
+                ConsoleColor.Cyan,
+                ConsoleColor.Magenta,
+            };
         static void Main(string[] args)
         {
             if (args.Length > 3 || args.Length < 1)
@@ -24,8 +33,8 @@ namespace AsmSpy
             }
 
 
-            var onlyConflicts = !args.Skip(1).Any( x=> x.Equals("all", StringComparison.OrdinalIgnoreCase) );  // args.Length != 2 || (args[1] != "all");
-            var skipSystem = args.Skip(1).Any( x=> x.Equals("nonsystem", StringComparison.OrdinalIgnoreCase) ); 
+            var onlyConflicts = !args.Skip(1).Any(x => x.Equals("all", StringComparison.OrdinalIgnoreCase));  // args.Length != 2 || (args[1] != "all");
+            var skipSystem = args.Skip(1).Any(x => x.Equals("nonsystem", StringComparison.OrdinalIgnoreCase));
 
             AnalyseAssemblies(new DirectoryInfo(directoryPath), onlyConflicts, skipSystem);
         }
@@ -74,19 +83,57 @@ namespace AsmSpy
 
             foreach (var assembly in assemblies)
             {
-                if ( skipSystem && ( assembly.Key.StartsWith("System")|| assembly.Key.StartsWith("mscorlib") ) ) continue;
-                
+                if (skipSystem && (assembly.Key.StartsWith("System") || assembly.Key.StartsWith("mscorlib"))) continue;
+
 
                 IList<ReferencedAssembly> refAsm = new List<ReferencedAssembly>();
 
                 if (!onlyConflicts
                     || (onlyConflicts && assembly.Value.GroupBy(x => x.VersionReferenced).Count() != 1))
                 {
-                    Console.WriteLine("Reference: {0}", assembly.Key);
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("Reference: ");
+                    Console.ForegroundColor = ConsoleColor.Gray;
+                    Console.WriteLine("{0}", assembly.Key);
+
+                    var referencedAssemblies = new List<Tuple<string, string>>();
+                    var versionsList = new List<string>();
+                    var asmList = new List<string>();
                     foreach (var referencedAssembly in assembly.Value)
                     {
-                        Console.WriteLine("\t{0} by {1}", referencedAssembly.VersionReferenced, referencedAssembly.ReferencedBy.GetName().Name);
+                        var s1 = referencedAssembly.VersionReferenced.ToString();
+                        var s2 = referencedAssembly.ReferencedBy.GetName().Name;
+                        var tuple = new Tuple<string, string>(s1, s2);
+                        referencedAssemblies.Add(tuple);
                     }
+
+                    foreach (var referencedAssembly in referencedAssemblies)
+                    {
+                        if (!versionsList.Contains(referencedAssembly.Item1))
+                        {
+                            versionsList.Add(referencedAssembly.Item1);
+                        }
+                        if (!asmList.Contains(referencedAssembly.Item1))
+                        {
+                            asmList.Add(referencedAssembly.Item1);
+                        }
+                    }
+
+                    foreach (var referencedAssembly in referencedAssemblies)
+                    {
+                        var versionColor = ConsoleColors[versionsList.IndexOf(referencedAssembly.Item1)%ConsoleColors.Length];
+
+                        Console.ForegroundColor = versionColor;
+                        Console.Write("   {0}", referencedAssembly.Item1);
+                        
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(" by ");
+                        
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        Console.WriteLine("{0}", referencedAssembly.Item2);
+                    }
+
+                    Console.WriteLine();
                 }
             }
         }
