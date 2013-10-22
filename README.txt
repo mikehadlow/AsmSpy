@@ -2,6 +2,8 @@ AsmSpy
 
 A simple command line tool to view assembly references.
 
+[Download AsmSpy.zip](http://static.mikehadlow.com/AsmSpy.exe). The zip file contains AsmSpy.exe.
+
 How it works:
 Simply run AsmSpy giving it a path to your bin directory (the folder where your project's assemblies live).
 
