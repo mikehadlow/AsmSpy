@@ -84,10 +84,7 @@ namespace AsmSpy
             foreach (var assembly in assemblies)
             {
                 if (skipSystem && (assembly.Key.StartsWith("System") || assembly.Key.StartsWith("mscorlib"))) continue;
-
-
-                IList<ReferencedAssembly> refAsm = new List<ReferencedAssembly>();
-
+                
                 if (!onlyConflicts
                     || (onlyConflicts && assembly.Value.GroupBy(x => x.VersionReferenced).Count() != 1))
                 {
