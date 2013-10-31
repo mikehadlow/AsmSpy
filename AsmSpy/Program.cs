@@ -59,7 +59,7 @@ namespace AsmSpy
                 Assembly assembly = null;
                 try
                 {
-                    assembly = Assembly.LoadFrom(fileInfo.FullName);
+                    assembly = Assembly.ReflectionOnlyLoadFrom(fileInfo.FullName);
                 }
                 catch (Exception)
                 {
