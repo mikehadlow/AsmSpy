@@ -61,9 +61,9 @@ namespace AsmSpy
                 {
                     assembly = Assembly.ReflectionOnlyLoadFrom(fileInfo.FullName);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    Console.WriteLine("Failed to load assembly: '{0}'", fileInfo.FullName);
+                    Console.WriteLine("Failed to load assembly '{0}': {1}", fileInfo.FullName, ex.Message);
                     continue;
                 }
 
