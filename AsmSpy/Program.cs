@@ -59,11 +59,11 @@ namespace AsmSpy
                 Assembly assembly = null;
                 try
                 {
-                    assembly = Assembly.LoadFrom(fileInfo.FullName);
+                    assembly = Assembly.ReflectionOnlyLoadFrom(fileInfo.FullName);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    Console.WriteLine("Failed to load assembly: '{0}'", fileInfo.FullName);
+                    Console.WriteLine("Failed to load assembly '{0}': {1}", fileInfo.FullName, ex.Message);
                     continue;
                 }
 
@@ -84,10 +84,7 @@ namespace AsmSpy
             foreach (var assembly in assemblies)
             {
                 if (skipSystem && (assembly.Key.StartsWith("System") || assembly.Key.StartsWith("mscorlib"))) continue;
-
-
-                IList<ReferencedAssembly> refAsm = new List<ReferencedAssembly>();
-
+                
                 if (!onlyConflicts
                     || (onlyConflicts && assembly.Value.GroupBy(x => x.VersionReferenced).Count() != 1))
                 {
