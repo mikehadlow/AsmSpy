@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -39,6 +40,15 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Native\FileInfoExtansions.cs" />
+    <Compile Include="Native\ImageDataDirectory.cs" />
+    <Compile Include="Native\ImageDosHeader.cs" />
+    <Compile Include="Native\ImageFileHeader.cs" />
+    <Compile Include="Native\ImageNtHeaders32.cs" />
+    <Compile Include="Native\ImageNtHeaders64.cs" />
+    <Compile Include="Native\ImageOptionalHeader32.cs" />
+    <Compile Include="Native\ImageOptionalHeader64.cs" />
+    <Compile Include="Native\MachineType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UnitTests.cs" />

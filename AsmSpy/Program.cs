@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using AsmSpy.Native;
 
 namespace AsmSpy
 {
@@ -59,6 +60,10 @@ namespace AsmSpy
                 Assembly assembly = null;
                 try
                 {
+                    if (!fileInfo.IsAssembly())
+                    {
+                        continue;
+                    }
                     assembly = Assembly.ReflectionOnlyLoadFrom(fileInfo.FullName);
                 }
                 catch (Exception ex)
