@@ -60,7 +60,7 @@ namespace AsmSpy
                 Assembly assembly = null;
                 try
                 {
-                    if (fileInfo.IsAssembly())
+                    if (!fileInfo.IsAssembly())
                     {
                         continue;
                     }
