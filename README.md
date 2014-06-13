@@ -11,9 +11,7 @@ Download [AsmSpy as a .zip here](http://static.mikehadlow.com/AsmSpy.zip). The .
 
 Simply run AsmSpy giving it a path to your bin directory (the folder where your project's assemblies live).
 
-``
-> AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin
-```
+    AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin
 
 It will output a list of all conflicting assembly references. That is where different assemblies in your bin folder reference different versions of the same assembly.
 
