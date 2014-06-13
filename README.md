@@ -1,19 +1,27 @@
 AsmSpy
+------
 
 A simple command line tool to view assembly references.
 
-Download AsmSpy.zip: http://static.mikehadlow.com/AsmSpy.zip. The zip file contains AsmSpy.exe.
+## Download 
 
-How it works:
+Download [AsmSpy as a .zip here](http://static.mikehadlow.com/AsmSpy.zip). The .zip file contains AsmSpy.exe.
+
+## How it works
+
 Simply run AsmSpy giving it a path to your bin directory (the folder where your project's assemblies live).
 
-    AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin
+``
+> AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin
+```
 
 It will output a list of all conflicting assembly references. That is where different assemblies in your bin folder reference different versions of the same assembly.
 
 To see a list of all assemblies and all references, just add the 'all' flag:
 
     AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin all
+    
+To ignore system assemblies, add the 'nonsystem' flag.
 
 The output looks something like this:
 
