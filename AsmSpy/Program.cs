@@ -10,14 +10,15 @@ namespace AsmSpy
     public class Program
     {
         static readonly ConsoleColor[] ConsoleColors = new ConsoleColor[]
-            {
-                ConsoleColor.Green,
-                ConsoleColor.Red,
-                ConsoleColor.Yellow,
-                ConsoleColor.Blue,
-                ConsoleColor.Cyan,
-                ConsoleColor.Magenta,
-            };
+        {
+            ConsoleColor.Green,
+            ConsoleColor.Red,
+            ConsoleColor.Yellow,
+            ConsoleColor.Blue,
+            ConsoleColor.Cyan,
+            ConsoleColor.Magenta,
+        };
+
         static void Main(string[] args)
         {
             if (args.Length > 3 || args.Length < 1)
@@ -89,7 +90,7 @@ namespace AsmSpy
             foreach (var assembly in assemblies)
             {
                 if (skipSystem && (assembly.Key.StartsWith("System") || assembly.Key.StartsWith("mscorlib"))) continue;
-                
+
                 if (!onlyConflicts
                     || (onlyConflicts && assembly.Value.GroupBy(x => x.VersionReferenced).Count() != 1))
                 {
@@ -123,14 +124,14 @@ namespace AsmSpy
 
                     foreach (var referencedAssembly in referencedAssemblies)
                     {
-                        var versionColor = ConsoleColors[versionsList.IndexOf(referencedAssembly.Item1)%ConsoleColors.Length];
+                        var versionColor = ConsoleColors[versionsList.IndexOf(referencedAssembly.Item1) % ConsoleColors.Length];
 
                         Console.ForegroundColor = versionColor;
                         Console.Write("   {0}", referencedAssembly.Item1);
-                        
+
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.Write(" by ");
-                        
+
                         Console.ForegroundColor = ConsoleColor.Gray;
                         Console.WriteLine("{0}", referencedAssembly.Item2);
                     }
