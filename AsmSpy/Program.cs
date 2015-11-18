@@ -87,22 +87,24 @@ namespace AsmSpy
             if (onlyConflicts)
                 Console.WriteLine("Detailing only conflicting assembly references.");
 
-            foreach (var assembly in assemblies)
+            foreach (var assemblyName in assemblies.Keys.OrderBy(asm => asm, StringComparer.OrdinalIgnoreCase))
             {
-                if (skipSystem && (assembly.Key.StartsWith("System") || assembly.Key.StartsWith("mscorlib"))) continue;
+                var assemblyValue = assemblies[assemblyName];
+
+                if (skipSystem && (assemblyName.StartsWith("System") || assemblyName.StartsWith("mscorlib"))) continue;
 
                 if (!onlyConflicts
-                    || (onlyConflicts && assembly.Value.GroupBy(x => x.VersionReferenced).Count() != 1))
+                    || (onlyConflicts && assemblyValue.GroupBy(x => x.VersionReferenced).Count() != 1))
                 {
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.Write("Reference: ");
                     Console.ForegroundColor = ConsoleColor.Gray;
-                    Console.WriteLine("{0}", assembly.Key);
+                    Console.WriteLine("{0}", assemblyName);
 
                     var referencedAssemblies = new List<Tuple<string, string>>();
                     var versionsList = new List<string>();
                     var asmList = new List<string>();
-                    foreach (var referencedAssembly in assembly.Value)
+                    foreach (var referencedAssembly in assemblyValue)
                     {
                         var s1 = referencedAssembly.VersionReferenced.ToString();
                         var s2 = referencedAssembly.ReferencedBy.GetName().Name;

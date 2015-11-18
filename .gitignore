@@ -10,3 +10,5 @@
 [Tt]humbs.db 
 _ReSharper.*
 .vs
+*.swp
+*.swo

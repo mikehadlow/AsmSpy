@@ -40,7 +40,7 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Native\FileInfoExtansions.cs" />
+    <Compile Include="Native\FileInfoExtensions.cs" />
     <Compile Include="Native\ImageDataDirectory.cs" />
     <Compile Include="Native\ImageDosHeader.cs" />
     <Compile Include="Native\ImageFileHeader.cs" />
