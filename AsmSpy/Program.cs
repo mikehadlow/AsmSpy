@@ -55,7 +55,7 @@ namespace AsmSpy
             Console.WriteLine(directoryInfo.FullName);
             Console.WriteLine("");
 
-            var assemblies = new Dictionary<string, IList<ReferencedAssembly>>();
+            var assemblies = new Dictionary<string, IList<ReferencedAssembly>>(StringComparer.OrdinalIgnoreCase);
             foreach (var fileInfo in assemblyFiles.OrderBy(asm => asm.Name))
             {
                 Assembly assembly = null;
@@ -87,24 +87,22 @@ namespace AsmSpy
             if (onlyConflicts)
                 Console.WriteLine("Detailing only conflicting assembly references.");
 
-            foreach (var assemblyName in assemblies.Keys.OrderBy(asm => asm, StringComparer.OrdinalIgnoreCase))
+            foreach (var assemblyReferences in assemblies.OrderBy(i => i.Key))
             {
-                var assemblyValue = assemblies[assemblyName];
-
-                if (skipSystem && (assemblyName.StartsWith("System") || assemblyName.StartsWith("mscorlib"))) continue;
+                if (skipSystem && (assemblyReferences.Key.StartsWith("System") || assemblyReferences.Key.StartsWith("mscorlib"))) continue;
 
                 if (!onlyConflicts
-                    || (onlyConflicts && assemblyValue.GroupBy(x => x.VersionReferenced).Count() != 1))
+                    || (onlyConflicts && assemblyReferences.Value.GroupBy(x => x.VersionReferenced).Count() != 1))
                 {
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.Write("Reference: ");
                     Console.ForegroundColor = ConsoleColor.Gray;
-                    Console.WriteLine("{0}", assemblyName);
+                    Console.WriteLine("{0}", assemblyReferences.Key);
 
                     var referencedAssemblies = new List<Tuple<string, string>>();
                     var versionsList = new List<string>();
                     var asmList = new List<string>();
-                    foreach (var referencedAssembly in assemblyValue)
+                    foreach (var referencedAssembly in assemblyReferences.Value)
                     {
                         var s1 = referencedAssembly.VersionReferenced.ToString();
                         var s2 = referencedAssembly.ReferencedBy.GetName().Name;
