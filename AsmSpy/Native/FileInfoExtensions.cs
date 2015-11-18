@@ -2,7 +2,7 @@
 
 namespace AsmSpy.Native
 {
-    internal static class FileInfoExtansions
+    internal static class FileInfoExtensions
     {
         internal static bool IsAssembly(this FileInfo fileInfo)
         {
