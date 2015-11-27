@@ -88,8 +88,12 @@ namespace AsmSpy
 
             foreach (var assembly in assemblies)
             {
-                if (skipSystem && (assembly.Key.StartsWith("System") || assembly.Key.StartsWith("mscorlib"))) continue;
-                
+                if (skipSystem && (assembly.Key.StartsWith("System")
+                 || assembly.Key.StartsWith("mscorlib")
+                 || assembly.Key.StartsWith("Microsoft")
+                 || assembly.Key.Equals("WindowsBase")
+                )) continue;
+
                 if (!onlyConflicts
                     || (onlyConflicts && assembly.Value.GroupBy(x => x.VersionReferenced).Count() != 1))
                 {
@@ -127,10 +131,10 @@ namespace AsmSpy
 
                         Console.ForegroundColor = versionColor;
                         Console.Write("   {0}", referencedAssembly.Item1);
-                        
+
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.Write(" by ");
-                        
+
                         Console.ForegroundColor = ConsoleColor.Gray;
                         Console.WriteLine("{0}", referencedAssembly.Item2);
                     }
