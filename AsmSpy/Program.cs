@@ -92,7 +92,8 @@ namespace AsmSpy
                 if (skipSystem && (assemblyReferences.Key.StartsWith("System") || assemblyReferences.Key.StartsWith("mscorlib"))) continue;
 
                 if (!onlyConflicts
-                    || (onlyConflicts && assemblyReferences.Value.GroupBy(x => x.VersionReferenced).Count() != 1))
+                    //|| (onlyConflicts && assemblyReferences.Value.GroupBy(x => x.VersionReferenced).Count() != 1))
+                    || assemblyReferences.Value.GroupBy(x => x.VersionReferenced).Count() != 1)
                 {
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.Write("Reference: ");
