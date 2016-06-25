@@ -153,10 +153,11 @@ namespace AsmSpy
         private static void PrintUsage()
         {
             Console.WriteLine("Usage:");
-            Console.WriteLine("AsmSpy <directory to load assemblies from> [all]");
+            Console.WriteLine("AsmSpy <directory to load assemblies from> [all|nonsystem]");
             Console.WriteLine("E.g.");
             Console.WriteLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug");
             Console.WriteLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug all");
+            Console.WriteLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug nonsystem");
         }
     }
 
