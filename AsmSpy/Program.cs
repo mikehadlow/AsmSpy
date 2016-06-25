@@ -19,9 +19,14 @@ namespace AsmSpy
             ConsoleColor.Magenta,
         };
 
+        static readonly string[] HelpSwitches = new string[] { "/?", "-?", "-help", "--help" };
+
         static void Main(string[] args)
         {
-            if (args.Length > 3 || args.Length < 1)
+            if (
+                args.Length > 3 || 
+                args.Length < 1 || 
+                args.Any(a => HelpSwitches.Contains(a, StringComparer.OrdinalIgnoreCase)))
             {
                 PrintUsage();
                 return;
