@@ -167,8 +167,6 @@ namespace AsmSpy
             Console.WriteLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug");
             Console.WriteLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug all");
             Console.WriteLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug nonsystem");
-
-           
         }
     }
 
