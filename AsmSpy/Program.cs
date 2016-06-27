@@ -155,11 +155,20 @@ namespace AsmSpy
         private static void PrintUsage()
         {
             Console.WriteLine("Usage:");
-            Console.WriteLine("AsmSpy <directory to load assemblies from> [all|nonsystem]");
+            Console.WriteLine("AsmSpy <directory to load assemblies from> [options]");
+            Console.WriteLine();
+
+            Console.WriteLine("Switches:");
+            Console.WriteLine("/all       : list all assemblies and references. Supported formats:  " + string.Join(",", AllSwitches));
+            Console.WriteLine("/nonsystem : list system assemblies. Supported formats:  " + string.Join(",", NonSystemSwitches));
+            Console.WriteLine();
+
             Console.WriteLine("E.g.");
             Console.WriteLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug");
             Console.WriteLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug all");
             Console.WriteLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug nonsystem");
+
+           
         }
     }
 
