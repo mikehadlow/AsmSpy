@@ -20,6 +20,8 @@ namespace AsmSpy
         };
 
         static readonly string[] HelpSwitches = new string[] { "/?", "-?", "-help", "--help" };
+        static readonly string[] NonSystemSwitches = new string[] { "/n", "nonsystem", "/nonsystem" };
+        static readonly string[] AllSwitches = new string[] { "/a", "all", "/all" };
 
         static void Main(string[] args)
         {
@@ -40,8 +42,8 @@ namespace AsmSpy
             }
 
 
-            var onlyConflicts = !args.Skip(1).Any(x => x.Equals("all", StringComparison.OrdinalIgnoreCase));  // args.Length != 2 || (args[1] != "all");
-            var skipSystem = args.Skip(1).Any(x => x.Equals("nonsystem", StringComparison.OrdinalIgnoreCase));
+            var onlyConflicts = !args.Skip(1).Any(x => AllSwitches.Contains(x, StringComparer.OrdinalIgnoreCase));  
+            var skipSystem = args.Skip(1).Any(x => NonSystemSwitches.Contains(x, StringComparer.OrdinalIgnoreCase));
 
             AnalyseAssemblies(new DirectoryInfo(directoryPath), onlyConflicts, skipSystem);
         }
