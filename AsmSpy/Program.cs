@@ -19,9 +19,16 @@ namespace AsmSpy
             ConsoleColor.Magenta,
         };
 
+        static readonly string[] HelpSwitches = new string[] { "/?", "-?", "-help", "--help" };
+        static readonly string[] NonSystemSwitches = new string[] { "/n", "nonsystem", "/nonsystem" };
+        static readonly string[] AllSwitches = new string[] { "/a", "all", "/all" };
+
         static void Main(string[] args)
         {
-            if (args.Length > 3 || args.Length < 1)
+            if (
+                args.Length > 3 || 
+                args.Length < 1 || 
+                args.Any(a => HelpSwitches.Contains(a, StringComparer.OrdinalIgnoreCase)))
             {
                 PrintUsage();
                 return;
@@ -35,8 +42,8 @@ namespace AsmSpy
             }
 
 
-            var onlyConflicts = !args.Skip(1).Any(x => x.Equals("all", StringComparison.OrdinalIgnoreCase));  // args.Length != 2 || (args[1] != "all");
-            var skipSystem = args.Skip(1).Any(x => x.Equals("nonsystem", StringComparison.OrdinalIgnoreCase));
+            var onlyConflicts = !args.Skip(1).Any(x => AllSwitches.Contains(x, StringComparer.OrdinalIgnoreCase));  
+            var skipSystem = args.Skip(1).Any(x => NonSystemSwitches.Contains(x, StringComparer.OrdinalIgnoreCase));
 
             AnalyseAssemblies(new DirectoryInfo(directoryPath), onlyConflicts, skipSystem);
         }
@@ -148,10 +155,18 @@ namespace AsmSpy
         private static void PrintUsage()
         {
             Console.WriteLine("Usage:");
-            Console.WriteLine("AsmSpy <directory to load assemblies from> [all]");
+            Console.WriteLine("AsmSpy <directory to load assemblies from> [options]");
+            Console.WriteLine();
+
+            Console.WriteLine("Switches:");
+            Console.WriteLine("/all       : list all assemblies and references. Supported formats:  " + string.Join(",", AllSwitches));
+            Console.WriteLine("/nonsystem : list system assemblies. Supported formats:  " + string.Join(",", NonSystemSwitches));
+            Console.WriteLine();
+
             Console.WriteLine("E.g.");
             Console.WriteLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug");
             Console.WriteLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug all");
+            Console.WriteLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug nonsystem");
         }
     }
 
