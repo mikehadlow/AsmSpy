@@ -15,6 +15,13 @@ Simply run AsmSpy giving it a path to your bin directory (the folder where your 
 
 It will output a list of all conflicting assembly references. That is where different assemblies in your bin folder reference different versions of the same assembly.
 
+### Switches:
+| Switch | Description |
+| --- | --- |
+| all | list all assemblies and references.<br> Supported formats:  /a, all, /all |
+| nonsystem | list system assemblies. <br> Supported formats:  /n, nonsystem, /nonsystem |
+
+### Examples
 To see a list of all assemblies and all references, just add the 'all' flag:
 
     AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin all
