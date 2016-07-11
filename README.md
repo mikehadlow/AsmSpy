@@ -9,7 +9,7 @@ Install [from Chocolatey package](https://chocolatey.org/packages/asmspy):
 
     C:\> choco install asmspy
 
-Download [AsmSpy as a .zip here](http://static.mikehadlow.com/AsmSpy.zip). The .zip file contains AsmSpy.exe.
+Or download [AsmSpy as a .zip here](http://static.mikehadlow.com/AsmSpy.zip). The .zip file contains AsmSpy.exe.
 
 ## How it works
 
