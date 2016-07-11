@@ -3,7 +3,11 @@ AsmSpy
 
 A simple command line tool to view assembly references.
 
-## Download 
+## Install 
+
+Install [from Chocolatey package](https://chocolatey.org/packages/asmspy):
+
+    C:\> choco install asmspy
 
 Download [AsmSpy as a .zip here](http://static.mikehadlow.com/AsmSpy.zip). The .zip file contains AsmSpy.exe.
 
