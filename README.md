@@ -1,3 +1,5 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/eka9d0tkw1gh70i5/branch/master?svg=true)](https://ci.appveyor.com/project/rahulpnath/asmspy/branch/master)
+
 AsmSpy
 ------
 
