@@ -4,50 +4,82 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using AsmSpy.Native;
+using CommandLine;
+using CommandLine.Text;
 
 namespace AsmSpy
 {
     public class Program
     {
+        public class Options
+        {
+            [ValueList(typeof(List<string>), MaximumElements = 1)]
+            public IList<string> DirectoryPath { get; set; }
+
+            [Option('n', "nonsystem", HelpText = "list system assemblies")]
+            public bool SkipSystem { get; set; }
+
+            [Option("dgml", HelpText = "export the references to DGML")]
+            public bool ExportToDgml { get; set; }
+
+            [Option("output", HelpText = "export filename")]
+            public string Output { get; set; }
+
+            [HelpOption]
+            public string GetUsage()
+            {
+                var help = new HelpText
+                {
+                    AdditionalNewLineAfterOption = true,
+                    AddDashesToOption = true,
+                };
+                help.AddPreOptionsLine("AsmSpy <directory to load assemblies from> [options]");
+                help.AddOptions(this);
+                help.AddPostOptionsLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug");
+                help.AddPostOptionsLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug all");
+                help.AddPostOptionsLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug nonsystem");
+                return help;
+            }
+        }
+
         static readonly string[] HelpSwitches = new string[] { "/?", "-?", "-help", "--help" };
         static readonly string[] NonSystemSwitches = new string[] { "/n", "nonsystem", "/nonsystem" };
         static readonly string[] AllSwitches = new string[] { "/a", "all", "/all" };
 
         static void Main(string[] args)
         {
-            if (
-                args.Length > 3 || 
-                args.Length < 1 || 
-                args.Any(a => HelpSwitches.Contains(a, StringComparer.OrdinalIgnoreCase)))
+            Options options = new Options();
+             
+            if (!Parser.Default.ParseArguments(args, options) || options.DirectoryPath.Count == 0)
             {
-                PrintUsage();
                 return;
             }
 
-            var directoryPath = args[0];
+            var directoryPath = options.DirectoryPath[0];
             if (!Directory.Exists(directoryPath))
             {
                 PrintDirectoryNotFound(directoryPath);
                 return;
             }
 
-
-            var onlyConflicts = !args.Skip(1).Any(x => AllSwitches.Contains(x, StringComparer.OrdinalIgnoreCase));  
-            var skipSystem = args.Skip(1).Any(x => NonSystemSwitches.Contains(x, StringComparer.OrdinalIgnoreCase));
+            var onlyConflicts = !args.Skip(1).Any(x => AllSwitches.Contains(x, StringComparer.OrdinalIgnoreCase));
+            var skipSystem = options.SkipSystem; 
 
             IDependencyAnalyzer analyzer = new DependencyAnalyzer() { DirectoryInfo = new DirectoryInfo(directoryPath) };
 
             Console.WriteLine("Check assemblies in:");
             Console.WriteLine(analyzer.DirectoryInfo);
             Console.WriteLine("");
-
             var result = analyzer.Analyze(assemblyName => Console.WriteLine(string.Format("Checking {0}", assemblyName)));
 
             IDependencyVisualizer visualizer = new ConsoleVisualizer(result) { SkipSystem = skipSystem, OnlyConflicts = onlyConflicts };
             visualizer.Visualize();
 
-            Console.ReadLine();
-
+            if (options.ExportToDgml)
+            {
+                IDependencyVisualizer dgmlExport = new DgmlExport(result, string.IsNullOrWhiteSpace(options.Output) ? Path.Combine(analyzer.DirectoryInfo.FullName, "references.dgml") : options.Output, new ConsoleLogger());
+                dgmlExport.Visualize();
+            }
         }
 
         private static void PrintDirectoryNotFound(string directoryPath)

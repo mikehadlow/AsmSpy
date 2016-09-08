@@ -12,3 +12,4 @@ _ReSharper.*
 .vs
 *.swp
 *.swo
+/packages/CommandLineParser.1.9.71

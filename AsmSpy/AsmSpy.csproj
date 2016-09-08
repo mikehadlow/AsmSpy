@@ -35,17 +35,24 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
+      <HintPath>..\packages\CommandLineParser.1.9.71\lib\net40\CommandLine.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyReferenceInfo.cs" />
+    <Compile Include="ConsoleLogger.cs" />
     <Compile Include="ConsoleVisualizer.cs" />
     <Compile Include="DependencyAnalyzer.cs" />
     <Compile Include="DependencyAnalyzerReport.cs" />
+    <Compile Include="DgmlExport.cs" />
     <Compile Include="IDependencyAnalyzer.cs" />
     <Compile Include="IDependencyVisualizer.cs" />
+    <Compile Include="ILogger.cs" />
     <Compile Include="Native\FileInfoExtensions.cs" />
     <Compile Include="Native\ImageDataDirectory.cs" />
     <Compile Include="Native\ImageDosHeader.cs" />
@@ -57,6 +64,9 @@
     <Compile Include="Native\MachineType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
