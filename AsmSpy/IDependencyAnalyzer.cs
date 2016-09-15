@@ -8,7 +8,7 @@ namespace AsmSpy
 {
     public interface IDependencyAnalyzer
     {
-        DependencyAnalyzerResult Analyze(Action<string> assemblyStart);
+        DependencyAnalyzerResult Analyze(ILogger logger);
         DirectoryInfo DirectoryInfo { get; }
     }
 }

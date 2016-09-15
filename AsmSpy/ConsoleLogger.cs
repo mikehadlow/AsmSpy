@@ -7,6 +7,13 @@ namespace AsmSpy
 {
     public class ConsoleLogger : ILogger
     {
+        bool _ShowMessages;
+
+        public ConsoleLogger(bool showMessages)
+        {
+            _ShowMessages = showMessages; 
+        }
+
         void WriteLine(string message, ConsoleColor color)
         {
             var restoreColor = Console.ForegroundColor;
@@ -22,7 +29,10 @@ namespace AsmSpy
 
         public void LogMessage(string message)
         {
-            Console.WriteLine(message);
+            if (_ShowMessages)
+            {
+                Console.WriteLine(message);
+            }
         }
 
         public void LogWarning(string message)
