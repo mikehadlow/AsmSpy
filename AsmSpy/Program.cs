@@ -1,75 +1,65 @@
 ﻿using System;
-using System.Linq;
-using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
-using AsmSpy.Native;
+using Microsoft.Extensions.CommandLineUtils;
 
 namespace AsmSpy
 {
     public class Program
     {
-        static readonly string[] HelpSwitches = new string[] { "/?", "-?", "-help", "--help" };
-        static readonly string[] NonSystemSwitches = new string[] { "/n", "nonsystem", "/nonsystem" };
-        static readonly string[] AllSwitches = new string[] { "/a", "all", "/all" };
-
         static void Main(string[] args)
         {
-            if (
-                args.Length > 3 || 
-                args.Length < 1 || 
-                args.Any(a => HelpSwitches.Contains(a, StringComparer.OrdinalIgnoreCase)))
+            CommandLineApplication commandLineApplication = new CommandLineApplication(throwOnUnexpectedArg: false);
+            CommandArgument directory = commandLineApplication.Argument("directory", "The directory to search for assemblies");
+            CommandOption dgmlExport = commandLineApplication.Option("-dg|--dgml <filename>", "Export to a dgml file", CommandOptionType.SingleValue);
+            CommandOption nonsystem = commandLineApplication.Option("-n|--nonsystem", "List system assemblies", CommandOptionType.NoValue);
+            CommandOption all = commandLineApplication.Option("-a|--all", "List all assemblies and references.", CommandOptionType.NoValue);
+            CommandOption noconsole = commandLineApplication.Option("-nc|--noconsole", "Do not show references on console.", CommandOptionType.NoValue);
+            CommandOption silent = commandLineApplication.Option("-s|--silent", "Do not show any message, only warnings and errors will be shown.", CommandOptionType.NoValue);
+
+            commandLineApplication.HelpOption("-? | -h | --help");
+            commandLineApplication.OnExecute(() =>
             {
-                PrintUsage();
-                return;
-            }
+                var consoleLogger = new ConsoleLogger(!silent.HasValue());
 
-            var directoryPath = args[0];
-            if (!Directory.Exists(directoryPath))
+                var directoryPath = directory.Value;
+                if (!Directory.Exists(directoryPath))
+                {
+                    consoleLogger.LogMessage(string.Format("Directory: '{0}' does not exist.", directoryPath));
+                    return -1;
+                }
+
+                var onlyConflicts = !all.HasValue();
+                var skipSystem = nonsystem.HasValue();
+
+                IDependencyAnalyzer analyzer = new DependencyAnalyzer() { DirectoryInfo = new DirectoryInfo(directoryPath) };
+
+                consoleLogger.LogMessage(string.Format("Check assemblies in: {0}", analyzer.DirectoryInfo));
+
+                var result = analyzer.Analyze(consoleLogger);
+
+                if (!noconsole.HasValue())
+                {
+                    IDependencyVisualizer visualizer = new ConsoleVisualizer(result) { SkipSystem = skipSystem, OnlyConflicts = onlyConflicts };
+                    visualizer.Visualize();
+                }
+
+                if (dgmlExport.HasValue())
+                {
+                    IDependencyVisualizer export = new DgmlExport(result, string.IsNullOrWhiteSpace(dgmlExport.Value()) ? Path.Combine(analyzer.DirectoryInfo.FullName, "references.dgml") : dgmlExport.Value(), consoleLogger);
+                    export.Visualize();
+                }
+
+                return 0;
+            });
+            try
             {
-                PrintDirectoryNotFound(directoryPath);
-                return;
+                commandLineApplication.Execute(args);
             }
-
-
-            var onlyConflicts = !args.Skip(1).Any(x => AllSwitches.Contains(x, StringComparer.OrdinalIgnoreCase));  
-            var skipSystem = args.Skip(1).Any(x => NonSystemSwitches.Contains(x, StringComparer.OrdinalIgnoreCase));
-
-            IDependencyAnalyzer analyzer = new DependencyAnalyzer() { DirectoryInfo = new DirectoryInfo(directoryPath) };
-
-            Console.WriteLine("Check assemblies in:");
-            Console.WriteLine(analyzer.DirectoryInfo);
-            Console.WriteLine("");
-
-            var result = analyzer.Analyze(assemblyName => Console.WriteLine(string.Format("Checking {0}", assemblyName)));
-
-            IDependencyVisualizer visualizer = new ConsoleVisualizer(result) { SkipSystem = skipSystem, OnlyConflicts = onlyConflicts };
-            visualizer.Visualize();
-
-            Console.ReadLine();
-
-        }
-
-        private static void PrintDirectoryNotFound(string directoryPath)
-        {
-            Console.WriteLine("Directory: '" + directoryPath + "' does not exist.");
-        }
-
-        private static void PrintUsage()
-        {
-            Console.WriteLine("Usage:");
-            Console.WriteLine("AsmSpy <directory to load assemblies from> [options]");
-            Console.WriteLine();
-
-            Console.WriteLine("Switches:");
-            Console.WriteLine("/all       : list all assemblies and references. Supported formats:  " + string.Join(",", AllSwitches));
-            Console.WriteLine("/nonsystem : list system assemblies. Supported formats:  " + string.Join(",", NonSystemSwitches));
-            Console.WriteLine();
-
-            Console.WriteLine("E.g.");
-            Console.WriteLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug");
-            Console.WriteLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug all");
-            Console.WriteLine(@"AsmSpy C:\Source\My.Solution\My.Project\bin\Debug nonsystem");
+            catch (CommandParsingException cpe)
+            {
+                Console.WriteLine(cpe.Message);
+                commandLineApplication.ShowHelp();
+            }
         }
     }
 }

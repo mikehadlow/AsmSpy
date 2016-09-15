@@ -35,7 +35,7 @@ namespace AsmSpy
         }
 
 
-        public DependencyAnalyzerResult Analyze(Action<string> assemblyStart)
+        public DependencyAnalyzerResult Analyze(ILogger logger)
         {
             var result = new DependencyAnalyzerResult();
 
@@ -49,7 +49,7 @@ namespace AsmSpy
             result.Assemblies = new Dictionary<string, AssemblyReferenceInfo>(StringComparer.OrdinalIgnoreCase);
             foreach (var fileInfo in result.AnalyzedFiles.OrderBy(asm => asm.Name))
             {
-                assemblyStart?.Invoke(fileInfo.Name);
+                logger.LogMessage(string.Format("Checking file {0}", fileInfo.Name));
                 Assembly assembly;
                 try
                 {
@@ -61,7 +61,7 @@ namespace AsmSpy
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("Failed to load assembly '{0}': {1}", fileInfo.FullName, ex.Message);
+                    logger.LogWarning(string.Format("Failed to load assembly '{0}': {1}", fileInfo.FullName, ex.Message));
                     continue;
                 }
                 var assemblyReferenceInfo = GetAssemblyReferenceInfo(result.Assemblies, assembly.GetName());
@@ -73,8 +73,6 @@ namespace AsmSpy
                     referencedAssemblyReferenceInfo.AddReferencedBy(assemblyReferenceInfo);
                 }
             }
-
-            
             return result;
         }
 
