@@ -12,6 +12,4 @@ _ReSharper.*
 .vs
 *.swp
 *.swo
-/packages/CommandLineParser.1.9.71
-/packages/Microsoft.Extensions.CommandLineUtils.1.0.0/lib
-/packages/Microsoft.Extensions.CommandLineUtils.1.0.0/Microsoft.Extensions.CommandLineUtils.1.0.0.nupkg
+/packages
