@@ -12,3 +12,4 @@ _ReSharper.*
 .vs
 *.swp
 *.swo
+/packages
