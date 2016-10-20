@@ -53,7 +53,10 @@ namespace AsmSpy
             });
             try
             {
-                commandLineApplication.Execute(args);
+                if (args == null || args.Length == 0)
+                    commandLineApplication.ShowHelp();
+                else
+                    commandLineApplication.Execute(args);
             }
             catch (CommandParsingException cpe)
             {
