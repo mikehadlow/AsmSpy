@@ -23,7 +23,7 @@ namespace AsmSpy
             return DirectoryInfo.GetFiles("*.dll").Concat(DirectoryInfo.GetFiles("*.exe"));
         }
 
-        private AssemblyReferenceInfo GetAssemblyReferenceInfo(Dictionary<string, AssemblyReferenceInfo> assemblies, AssemblyName assemblyName)
+        private AssemblyReferenceInfo GetAssemblyReferenceInfo(IDictionary<string, AssemblyReferenceInfo> assemblies, AssemblyName assemblyName)
         {
             AssemblyReferenceInfo assemblyReferenceInfo;
             if (!assemblies.TryGetValue(assemblyName.FullName, out assemblyReferenceInfo))
@@ -65,12 +65,31 @@ namespace AsmSpy
                     continue;
                 }
                 var assemblyReferenceInfo = GetAssemblyReferenceInfo(result.Assemblies, assembly.GetName());
-
+                assemblyReferenceInfo.ReflectionOnlyAssembly = assembly;
+                assemblyReferenceInfo.AssemblySource = AssemblySource.Local;
                 foreach (var referencedAssembly in assembly.GetReferencedAssemblies())
                 {
                     var referencedAssemblyReferenceInfo = GetAssemblyReferenceInfo(result.Assemblies, referencedAssembly); ;
                     assemblyReferenceInfo.AddReference(referencedAssemblyReferenceInfo);
                     referencedAssemblyReferenceInfo.AddReferencedBy(assemblyReferenceInfo);
+                }
+            }
+
+            foreach (var assembly in result.Assemblies.Values)
+            {
+                if (assembly.ReflectionOnlyAssembly != null)
+                {
+                    continue;
+                }
+                logger.LogMessage(string.Format("Checking reference {0}", assembly.AssemblyName.Name));
+                try
+                {
+                    assembly.ReflectionOnlyAssembly = Assembly.ReflectionOnlyLoad(assembly.AssemblyName.FullName);
+                    assembly.AssemblySource = assembly.ReflectionOnlyAssembly.GlobalAssemblyCache ? AssemblySource.GAC : AssemblySource.Unknown;
+                }
+                catch (Exception ex)
+                {
+                    // TODO: Show message?
                 }
             }
             return result;

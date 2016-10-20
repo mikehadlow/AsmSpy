@@ -45,7 +45,7 @@ namespace AsmSpy
         {
             if (_AnalyzerResult.AnalyzedFiles.Length <= 0)
             {
-                Console.WriteLine("No dll files found in directory");
+                Console.WriteLine("No assemblies files found in directory");
                 return;
             }
 
@@ -54,58 +54,44 @@ namespace AsmSpy
                 Console.WriteLine("Detailing only conflicting assembly references.");
             }
 
-            foreach (var assemblyReferences in _AnalyzerResult.Assemblies.OrderBy(i => i.Key))
+            var assemblyGroups = _AnalyzerResult.Assemblies.Values.GroupBy(x => x.AssemblyName.Name);
+
+            foreach (var assemblyGroup in assemblyGroups.OrderBy(i => i.Key))
             {
-                if (SkipSystem && (assemblyReferences.Key.StartsWith("System") || assemblyReferences.Key.StartsWith("mscorlib"))) continue;
 
-                var referencesTo = assemblyReferences.Value.ReferencedBy;
+                if (SkipSystem && (assemblyGroup.Key.StartsWith("System") || assemblyGroup.Key.StartsWith("mscorlib"))) continue;
 
-                if (!OnlyConflicts || referencesTo.Length > 0)
+                //var assemblyInfos = assemblyGroup.OrderBy(x => x.AssemblyName.Version).ToList();
+                var assemblyInfos = assemblyGroup.OrderByDescending(x => x.ReferencedBy.Length).ToList();
+                if (OnlyConflicts && assemblyInfos.Count <= 1) continue;
+
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("Reference: ");
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine("{0}", assemblyGroup.Key);
+                
+                for (var i = 0; i < assemblyInfos.Count; i++)
                 {
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write("Reference: ");
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                    Console.WriteLine("{0}", assemblyReferences.Key);
+                    var assemblyInfo = assemblyInfos[i];
+                    var versionColor = ConsoleColors[i % ConsoleColors.Length];
 
-                    var referencedAssemblies = new List<Tuple<string, string>>();
-                    var versionsList = new List<string>();
-                    var asmList = new List<string>();
-                    foreach (var referencedAssembly in referencesTo)
+                    Console.ForegroundColor = versionColor;
+                    Console.WriteLine("  {0}, Source: {1}", assemblyInfo.AssemblyName, assemblyInfo.AssemblySource);
+
+                    foreach (var referer in assemblyInfo.ReferencedBy)
                     {
-                        var s1 = referencedAssembly.AssemblyName.Version.ToString();
-                        var s2 = referencedAssembly.AssemblyName.FullName;
-                        var tuple = new Tuple<string, string>(s1, s2);
-                        referencedAssemblies.Add(tuple);
-                    }
-
-                    foreach (var referencedAssembly in referencedAssemblies)
-                    {
-                        if (!versionsList.Contains(referencedAssembly.Item1))
-                        {
-                            versionsList.Add(referencedAssembly.Item1);
-                        }
-                        if (!asmList.Contains(referencedAssembly.Item1))
-                        {
-                            asmList.Add(referencedAssembly.Item1);
-                        }
-                    }
-
-                    foreach (var referencedAssembly in referencedAssemblies)
-                    {
-                        var versionColor = ConsoleColors[versionsList.IndexOf(referencedAssembly.Item1) % ConsoleColors.Length];
-
                         Console.ForegroundColor = versionColor;
-                        Console.Write("   {0}", referencedAssembly.Item1);
+                        Console.Write("    {0}", assemblyInfo.AssemblyName.Version);
 
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.Write(" by ");
 
                         Console.ForegroundColor = ConsoleColor.Gray;
-                        Console.WriteLine("{0}", referencedAssembly.Item2);
+                        Console.WriteLine("{0}", referer.AssemblyName);
                     }
-
-                    Console.WriteLine();
                 }
+
+                Console.WriteLine();
             }
         }
 
