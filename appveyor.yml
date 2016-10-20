@@ -5,7 +5,7 @@ build:
   verbosity: minimal
 after_build:
 - cmd: >-
-    7z a asmspy.zip .\AsmSpy\bin\Debug\AsmSpy.exe
+    7z a asmspy.zip .\AsmSpy\bin\Debug\AsmSpy.exe .\AsmSpy\bin\Debug\Microsoft.Extensions.CommandLineUtils.dll
 
     if defined APPVEYOR_REPO_TAG_NAME choco pack .\AsmSpy\AsmSpy.nuspec --version %APPVEYOR_REPO_TAG_NAME%
 
