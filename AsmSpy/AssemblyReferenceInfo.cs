@@ -17,6 +17,8 @@ namespace AsmSpy
 
         #region Properties
 
+        public Assembly ReflectionOnlyAssembly { get; set; }
+        public AssemblySource AssemblySource { get; set; }
         public AssemblyName AssemblyName { get; private set; }
         public AssemblyReferenceInfo[] ReferencedBy { get { return _ReferencedBy.ToArray(); } }
         public AssemblyReferenceInfo[] References { get { return _References.ToArray(); } }

@@ -45,7 +45,7 @@ namespace AsmSpy
         {
             if (_AnalyzerResult.AnalyzedFiles.Length <= 0)
             {
-                Console.WriteLine("No dll files found in directory");
+                Console.WriteLine("No assemblies files found in directory");
                 return;
             }
 
@@ -76,7 +76,7 @@ namespace AsmSpy
                     var versionColor = ConsoleColors[i % ConsoleColors.Length];
 
                     Console.ForegroundColor = versionColor;
-                    Console.WriteLine("  {0}", assemblyInfo.AssemblyName);
+                    Console.WriteLine("  {0}, Source: {1}", assemblyInfo.AssemblyName, assemblyInfo.AssemblySource);
 
                     foreach (var referer in assemblyInfo.ReferencedBy)
                     {
