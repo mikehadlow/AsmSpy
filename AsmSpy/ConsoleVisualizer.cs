@@ -61,40 +61,37 @@ namespace AsmSpy
 
                 if (SkipSystem && (assemblyGroup.Key.StartsWith("System") || assemblyGroup.Key.StartsWith("mscorlib"))) continue;
 
-                var totalReferenceCount = assemblyGroup.Sum(x => x.ReferencedBy.Length);
+                //var assemblyInfos = assemblyGroup.OrderBy(x => x.AssemblyName.Version).ToList();
+                var assemblyInfos = assemblyGroup.OrderByDescending(x => x.ReferencedBy.Length).ToList();
+                if (OnlyConflicts && assemblyInfos.Count <= 1) continue;
 
-                if (!OnlyConflicts || totalReferenceCount > 0)
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("Reference: ");
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine("{0}", assemblyGroup.Key);
+                
+                for (var i = 0; i < assemblyInfos.Count; i++)
                 {
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write("Reference: ");
-                    Console.ForegroundColor = ConsoleColor.Gray;
-                    Console.WriteLine("{0}", assemblyGroup.Key);
+                    var assemblyInfo = assemblyInfos[i];
+                    var versionColor = ConsoleColors[i % ConsoleColors.Length];
 
-                    //var assemblyInfos = assemblyGroup.OrderBy(x => x.AssemblyName.Version).ToList();
-                    var assemblyInfos = assemblyGroup.OrderByDescending(x => x.ReferencedBy.Length).ToList();
-                    for (var i = 0; i < assemblyInfos.Count; i++)
+                    Console.ForegroundColor = versionColor;
+                    Console.WriteLine("  {0}", assemblyInfo.AssemblyName);
+
+                    foreach (var referer in assemblyInfo.ReferencedBy)
                     {
-                        var assemblyInfo = assemblyInfos[i];
-                        var versionColor = ConsoleColors[i % ConsoleColors.Length];
-
                         Console.ForegroundColor = versionColor;
-                        Console.WriteLine("  {0}", assemblyInfo.AssemblyName);
+                        Console.Write("    {0}", assemblyInfo.AssemblyName.Version);
 
-                        foreach (var referer in assemblyInfo.ReferencedBy)
-                        {
-                            Console.ForegroundColor = versionColor;
-                            Console.Write("    {0}", assemblyInfo.AssemblyName.Version);
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.Write(" by ");
 
-                            Console.ForegroundColor = ConsoleColor.White;
-                            Console.Write(" by ");
-
-                            Console.ForegroundColor = ConsoleColor.Gray;
-                            Console.WriteLine("{0}", referer.AssemblyName);
-                        }
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                        Console.WriteLine("{0}", referer.AssemblyName);
                     }
-
-                    Console.WriteLine();
                 }
+
+                Console.WriteLine();
             }
         }
 
