@@ -24,13 +24,16 @@ It will output a list of all conflicting assembly references. That is where diff
 ### Switches:
 | Switch | Description |
 | --- | --- |
-| all | list all assemblies and references.<br> Supported formats:  /a, all, /all |
-| nonsystem | list system assemblies. <br> Supported formats:  /n, nonsystem, /nonsystem |
+| all | list all assemblies and references.<br> Supported formats:  -a, --all |
+| nonsystem | list system assemblies. <br> Supported formats:  -n, --nonsystem |
+| noconsole | do not show reference output on console.<br> Supported formats:  -nc, --noconsole |
+| silent | do not show any output, only warnings and errors will be shown.<br> Supported formats:  -s, --silent |
+| dgml | export dependancy graph to a dgml file.<br> Supported formats:  -dg \<filename\>, --silent \<filename\> |
 
 ### Examples
 To see a list of all assemblies and all references, just add the 'all' flag:
 
-    AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin all
+    AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin --all
     
 To ignore system assemblies, add the 'nonsystem' flag.
 
@@ -58,3 +61,7 @@ The output looks something like this:
 You can see that System.Web.Mvc is referenced by 7 assemblies in my bin folder. Some reference 
 version 2.0.0.0 and some version 3.0.0.0. I can now resolve any conflicts.
 
+Color coding is used to more easily distinguish any problems.
+* Green - referenced assembly found locally, in the specified directory
+* Yellow - referenced assembly not found locally, but found installed in the [Global Assembly Cache](https://msdn.microsoft.com/en-us/library/yf1d93sz(v=vs.110).aspx)
+* Red - referenced assembly missing
