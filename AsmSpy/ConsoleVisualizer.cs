@@ -55,8 +55,7 @@ namespace AsmSpy
             {
                 if (SkipSystem && (assemblyGroup.Key.StartsWith("System") || assemblyGroup.Key.StartsWith("mscorlib"))) continue;
 
-                //var assemblyInfos = assemblyGroup.OrderBy(x => x.AssemblyName.Version).ToList();
-                var assemblyInfos = assemblyGroup.OrderByDescending(x => x.ReferencedBy.Length).ToList();
+                var assemblyInfos = assemblyGroup.OrderBy(x => x.AssemblyName.ToString()).ToList();
                 if (OnlyConflicts && assemblyInfos.Count <= 1) continue;
 
                 Console.ForegroundColor = ConsoleColor.White;
@@ -117,7 +116,7 @@ namespace AsmSpy
                         Console.WriteLine();
                     }
 
-                    foreach (var referer in assemblyInfo.ReferencedBy)
+                    foreach (var referer in assemblyInfo.ReferencedBy.OrderBy(x => x.AssemblyName.ToString()))
                     {
                         Console.ForegroundColor = statusColor;
                         Console.Write("    {0}", assemblyInfo.AssemblyName.Version);
