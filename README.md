@@ -62,6 +62,6 @@ You can see that System.Web.Mvc is referenced by 7 assemblies in my bin folder. 
 version 2.0.0.0 and some version 3.0.0.0. I can now resolve any conflicts.
 
 Color coding is used to more easily distinguish any problems.
-* Green - refered assembly found locally, in the specified directory
-* Yellow - refered assembly not found locally, but found installed in the [Global Assembly Cache](https://msdn.microsoft.com/en-us/library/yf1d93sz(v=vs.110).aspx)
-* Red - refered assembly missing
+* Green - referenced assembly found locally, in the specified directory
+* Yellow - referenced assembly not found locally, but found installed in the [Global Assembly Cache](https://msdn.microsoft.com/en-us/library/yf1d93sz(v=vs.110).aspx)
+* Red - referenced assembly missing
