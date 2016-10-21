@@ -7,15 +7,10 @@ namespace AsmSpy
 {
     public class ConsoleVisualizer : IDependencyVisualizer
     {
-        static readonly ConsoleColor[] ConsoleColors = new ConsoleColor[]
-        {
-            ConsoleColor.Green,
-            ConsoleColor.Red,
-            ConsoleColor.Yellow,
-            ConsoleColor.Blue,
-            ConsoleColor.Cyan,
-            ConsoleColor.Magenta,
-        };
+        private const ConsoleColor AssemblyNotFoundColor = ConsoleColor.Red;
+        private const ConsoleColor AssemblyLocalColor = ConsoleColor.Green;
+        private const ConsoleColor AssemblyGACColor = ConsoleColor.Yellow;
+        private const ConsoleColor AssemblyUnknownColor = ConsoleColor.Magenta;
 
         #region Fields
 
@@ -58,7 +53,6 @@ namespace AsmSpy
 
             foreach (var assemblyGroup in assemblyGroups.OrderBy(i => i.Key))
             {
-
                 if (SkipSystem && (assemblyGroup.Key.StartsWith("System") || assemblyGroup.Key.StartsWith("mscorlib"))) continue;
 
                 //var assemblyInfos = assemblyGroup.OrderBy(x => x.AssemblyName.Version).ToList();
@@ -67,20 +61,65 @@ namespace AsmSpy
 
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write("Reference: ");
-                Console.ForegroundColor = ConsoleColor.Gray;
+
+                ConsoleColor mainNameColor;
+                if (assemblyInfos.Any(x => x.AssemblySource == AssemblySource.Unknown))
+                {
+                    mainNameColor = AssemblyUnknownColor;
+                }
+                else if (assemblyInfos.Any(x => x.AssemblySource == AssemblySource.NotFound))
+                {
+                    mainNameColor = AssemblyNotFoundColor;
+                }
+                else if (assemblyInfos.Any(x => x.AssemblySource == AssemblySource.GAC))
+                {
+                    mainNameColor = AssemblyGACColor;
+                }
+                else 
+                {
+                    mainNameColor = AssemblyLocalColor;
+                }
+
+                Console.ForegroundColor = mainNameColor;
                 Console.WriteLine("{0}", assemblyGroup.Key);
                 
                 for (var i = 0; i < assemblyInfos.Count; i++)
                 {
                     var assemblyInfo = assemblyInfos[i];
-                    var versionColor = ConsoleColors[i % ConsoleColors.Length];
 
-                    Console.ForegroundColor = versionColor;
-                    Console.WriteLine("  {0}, Source: {1}", assemblyInfo.AssemblyName, assemblyInfo.AssemblySource);
+                    ConsoleColor statusColor;
+                    switch (assemblyInfo.AssemblySource)
+                    {
+                        case AssemblySource.NotFound:
+                            statusColor = AssemblyNotFoundColor;
+                            break;
+                        case AssemblySource.Local:
+                            statusColor = AssemblyLocalColor;
+                            break;
+                        case AssemblySource.GAC:
+                            statusColor = AssemblyGACColor;
+                            break;
+                        case AssemblySource.Unknown:
+                            statusColor = AssemblyUnknownColor;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                    Console.ForegroundColor = statusColor;
+                    Console.WriteLine("  {0}", assemblyInfo.AssemblyName);
+                    Console.Write("  Source: {0}", assemblyInfo.AssemblySource);
+                    if (assemblyInfo.AssemblySource != AssemblySource.NotFound)
+                    {
+                        Console.WriteLine(", Location: {0}", assemblyInfo.ReflectionOnlyAssembly.Location);
+                    }
+                    else
+                    {
+                        Console.WriteLine();
+                    }
 
                     foreach (var referer in assemblyInfo.ReferencedBy)
                     {
-                        Console.ForegroundColor = versionColor;
+                        Console.ForegroundColor = statusColor;
                         Console.Write("    {0}", assemblyInfo.AssemblyName.Version);
 
                         Console.ForegroundColor = ConsoleColor.White;
@@ -93,6 +132,7 @@ namespace AsmSpy
 
                 Console.WriteLine();
             }
+            Console.ResetColor();
         }
 
         #endregion
