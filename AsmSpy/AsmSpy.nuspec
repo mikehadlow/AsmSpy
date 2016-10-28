@@ -24,5 +24,6 @@
   <files>
     <file src="bin\Debug\AsmSpy.exe" target="tools" />
     <file src="bin\Debug\Microsoft.Extensions.CommandLineUtils.dll" target="tools" />
+    <file src="License.txt" target="tools" />
   </files>
 </package>
