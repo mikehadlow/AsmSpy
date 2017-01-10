@@ -25,7 +25,7 @@ It will output a list of all conflicting assembly references. That is where diff
 | Switch | Description |
 | --- | --- |
 | all | list all assemblies and references.<br> Supported formats:  -a, --all |
-| nonsystem | list system assemblies. <br> Supported formats:  -n, --nonsystem |
+| nonsystem | ignore system assemblies. <br> Supported formats:  -n, --nonsystem |
 | noconsole | do not show reference output on console.<br> Supported formats:  -nc, --noconsole |
 | silent | do not show any output, only warnings and errors will be shown.<br> Supported formats:  -s, --silent |
 | dgml | export dependancy graph to a dgml file.<br> Supported formats:  -dg \<filename\>, --silent \<filename\> |
