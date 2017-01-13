@@ -2,7 +2,13 @@
 {
     internal struct ImageDataDirectory
     {
-        public uint VirtualAddress;
-        public uint Size;
+        public ImageDataDirectory(uint size, uint virtualAddress)
+        {
+            Size = size;
+            VirtualAddress = virtualAddress;
+        }
+
+        public uint VirtualAddress { get; }
+        public uint Size { get; }
     }
 }

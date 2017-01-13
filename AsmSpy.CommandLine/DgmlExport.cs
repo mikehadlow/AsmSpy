@@ -1,40 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Globalization;
 using System.IO;
-using System.Linq;
 using System.Text;
 
-namespace AsmSpy
+namespace AsmSpy.CommandLine
 {
     public class DgmlExport : IDependencyVisualizer
     {
-        DependencyAnalyzerResult _Result;
-        string _ExportFilename;
-        ILogger _Logger;
+        private readonly DependencyAnalyzerResult _result;
+        private readonly string _exportFileName;
+        private readonly ILogger _logger;
 
-        public DgmlExport(DependencyAnalyzerResult result, string exportFilename, ILogger logger)
+        public DgmlExport(DependencyAnalyzerResult result, string exportFileName, ILogger logger)
         {
-            _Result = result;
-            _ExportFilename = exportFilename;
-            _Logger = logger;
+            _result = result;
+            _exportFileName = exportFileName;
+            _logger = logger;
         }
 
         public void Visualize()
         {
             var nodes = new StringBuilder();
 
-            foreach (var assemblyReference in _Result.Assemblies.Values)
+            foreach (var assemblyReference in _result.Assemblies.Values)
             {
-                nodes.AppendFormat("<Node Id=\"{0}\" Label=\"{1}\" Category=\"Assembly\" />\n",
+                nodes.AppendFormat(CultureInfo.InvariantCulture, "<Node Id=\"{0}\" Label=\"{1}\" Category=\"Assembly\" />\n",
                     assemblyReference.AssemblyName.FullName, assemblyReference.AssemblyName.Name);
             }
 
             var links = new StringBuilder();
-            foreach (var assemblyReference in _Result.Assemblies.Values)
+            foreach (var assemblyReference in _result.Assemblies.Values)
             {
                 foreach (var referenceTo in assemblyReference.References)
                 {
-                    links.AppendFormat("<Link Source=\"{0}\" Target=\"{1}\" Category=\"Reference\" />\n",
+                    links.AppendFormat(CultureInfo.InvariantCulture, "<Link Source=\"{0}\" Target=\"{1}\" Category=\"Reference\" />\n",
                         assemblyReference.AssemblyName.FullName, referenceTo.AssemblyName.FullName);
                 }
             }
@@ -45,6 +43,7 @@ namespace AsmSpy
 
             dgml.Append("<Nodes>\n");
             dgml.Append(nodes);
+            
             dgml.Append("</Nodes>\n");
 
             dgml.Append("<Links>\n");
@@ -59,16 +58,16 @@ namespace AsmSpy
             dgml.Append("</DirectedGraph>\n");
             try
             {
-                File.WriteAllText(_ExportFilename, dgml.ToString());
-                _Logger.LogMessage(string.Format("Exported to file {0}", _ExportFilename));
+                File.WriteAllText(_exportFileName, dgml.ToString());
+                _logger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Exported to file {0}", _exportFileName));
             }
             catch (System.UnauthorizedAccessException uae)
             {
-                _Logger.LogError(string.Format("Could not write file {0} due to error {1}", _ExportFilename, uae.Message));
+                _logger.LogError(string.Format(CultureInfo.InvariantCulture, "Could not write file {0} due to error {1}", _exportFileName, uae.Message));
             }
-            catch (System.IO.DirectoryNotFoundException dnfe)
+            catch (DirectoryNotFoundException dnfe)
             {
-                _Logger.LogError(string.Format("Could not write file {0} due to error {1}", _ExportFilename, dnfe.Message));            
+                _logger.LogError(string.Format(CultureInfo.InvariantCulture, "Could not write file {0} due to error {1}", _exportFileName, dnfe.Message));            
             }
         }
     }

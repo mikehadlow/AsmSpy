@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace AsmSpy
 {
@@ -10,8 +8,8 @@ namespace AsmSpy
     {
         #region Fields
 
-        HashSet<AssemblyReferenceInfo> _References = new HashSet<AssemblyReferenceInfo>();
-        HashSet<AssemblyReferenceInfo> _ReferencedBy = new HashSet<AssemblyReferenceInfo>();
+        private readonly HashSet<AssemblyReferenceInfo> _references = new HashSet<AssemblyReferenceInfo>();
+        private readonly HashSet<AssemblyReferenceInfo> _referencedBy = new HashSet<AssemblyReferenceInfo>();
 
         #endregion
 
@@ -19,9 +17,9 @@ namespace AsmSpy
 
         public Assembly ReflectionOnlyAssembly { get; set; }
         public AssemblySource AssemblySource { get; set; }
-        public AssemblyName AssemblyName { get; private set; }
-        public AssemblyReferenceInfo[] ReferencedBy { get { return _ReferencedBy.ToArray(); } }
-        public AssemblyReferenceInfo[] References { get { return _References.ToArray(); } }
+        public AssemblyName AssemblyName { get; }
+        public ICollection<AssemblyReferenceInfo> ReferencedBy => _referencedBy.ToArray();
+        public ICollection<AssemblyReferenceInfo> References => _references.ToArray();
 
         #endregion
 
@@ -38,17 +36,17 @@ namespace AsmSpy
 
         public void AddReference(AssemblyReferenceInfo info)
         {
-            if (!_References.Contains(info))
+            if (!_references.Contains(info))
             {
-                _References.Add(info);
+                _references.Add(info);
             }
         }
 
         public void AddReferencedBy(AssemblyReferenceInfo info)
         {
-            if (!_ReferencedBy.Contains(info))
+            if (!_referencedBy.Contains(info))
             {
-                _ReferencedBy.Add(info);
+                _referencedBy.Add(info);
             }
         }
 

@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-namespace AsmSpy
+namespace AsmSpy.CommandLine
 {
     public class ConsoleLogger : ILogger
     {
-        bool _ShowMessages;
+        private readonly bool _showMessages;
 
         public ConsoleLogger(bool showMessages)
         {
-            _ShowMessages = showMessages; 
+            _showMessages = showMessages;
         }
 
-        void WriteLine(string message, ConsoleColor color)
+        public virtual void WriteLine(string message, ConsoleColor color)
         {
             var restoreColor = Console.ForegroundColor;
             Console.ForegroundColor = color;
@@ -22,20 +19,20 @@ namespace AsmSpy
             Console.ForegroundColor = restoreColor;
         }
 
-        public void LogError(string message)
+        public virtual void LogError(string message)
         {
             WriteLine(message, ConsoleColor.Red);
         }
 
-        public void LogMessage(string message)
+        public virtual void LogMessage(string message)
         {
-            if (_ShowMessages)
+            if (_showMessages)
             {
                 Console.WriteLine(message);
             }
         }
 
-        public void LogWarning(string message)
+        public virtual void LogWarning(string message)
         {
             WriteLine(message, ConsoleColor.Yellow);
         }
