@@ -43,7 +43,7 @@ namespace AsmSpy
             {
                 throw new ArgumentNullException(nameof(logger));
             }
-            var result = new DependencyAnalyzerResult {AnalyzedFiles = GetLibrariesAndExecutables().ToArray()};
+            var result = new DependencyAnalyzerResult(GetLibrariesAndExecutables().ToArray());
 
 
             if (result.AnalyzedFiles.Count <= 0)
@@ -51,7 +51,6 @@ namespace AsmSpy
                 return result;
             }
 
-            result.Assemblies = new Dictionary<string, AssemblyReferenceInfo>(StringComparer.OrdinalIgnoreCase);
             foreach (var fileInfo in result.AnalyzedFiles.OrderBy(asm => asm.Name))
             {
                 logger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Checking file {0}", fileInfo.Name));
