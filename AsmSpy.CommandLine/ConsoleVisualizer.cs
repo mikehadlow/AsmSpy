@@ -23,6 +23,8 @@ namespace AsmSpy.CommandLine
         public bool OnlyConflicts { get; set; }
         public bool SkipSystem { get; set; }
 
+        public string ReferencedStartsWith { get; set; }
+
         #endregion
 
         #region Constructor
@@ -64,9 +66,14 @@ namespace AsmSpy.CommandLine
                     continue;
                 }
 
+                if (!string.IsNullOrEmpty(ReferencedStartsWith) && !assemblyInfos.SelectMany(x => x.ReferencedBy).GroupBy(x => x.AssemblyName.Name.ToUpperInvariant().StartsWith(ReferencedStartsWith.ToUpperInvariant(), StringComparison.OrdinalIgnoreCase)).Any())
+                {
+                    continue;
+                }
+
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write("Reference: ");
-                Console.ForegroundColor = GetMainNameColor(assemblyInfos);
+                    Console.ForegroundColor = GetMainNameColor(assemblyInfos);
                 Console.WriteLine("{0}", assemblyGroup.Key);
                 
                 foreach (var assemblyInfo in assemblyInfos)
