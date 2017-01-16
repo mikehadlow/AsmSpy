@@ -63,7 +63,15 @@ namespace AsmSpy.CommandLine
                 var assemblyInfos = assemblyGroup.OrderBy(x => x.AssemblyName.ToString()).ToList();
                 if (OnlyConflicts && assemblyInfos.Count <= 1)
                 {
-                    continue;
+                    if (assemblyInfos.Count == 1 && assemblyInfos[0].AssemblySource == AssemblySource.Local)
+                    {
+                        continue;
+                    }
+
+                    if (assemblyInfos.Count <= 0)
+                    {
+                        continue;
+                    }
                 }
 
 
