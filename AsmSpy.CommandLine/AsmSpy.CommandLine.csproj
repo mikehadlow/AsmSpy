@@ -93,7 +93,14 @@
     <Delete Files="$(ILMergeOutputFilePath)" Condition="Exists($(ILMergeOutputFilePath))" />
     <!-- ILMerge does not yet support .NET 4.0  http://nitoprograms.blogspot.com/2010/09/using-ilmerge-with-net-40-andor-rx.html /targetplatform:v4,"%ProgramFiles%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" -->
     <Error Condition="!Exists('$(FrameworkPath)')" Text="Could not find 4.0 reference assemblies in $(FrameworkPath)" />
-    <Exec Command="&quot;$(ILMergeExe)&quot; $(ILMergeCommandArgs)" WorkingDirectory="$(OutputPath)" />	
+    <Exec Command="&quot;$(ILMergeExe)&quot; $(ILMergeCommandArgs)" WorkingDirectory="$(OutputPath)" />
+	<Delete Files="$(OutputPath)AsmSpy.exe" Condition="Exists('$(OutputPath)AsmSpy.exe')" />
+	<Delete Files="$(OutputPath)AsmSpy.pdb" Condition="Exists('$(OutputPath)AsmSpy.pdb')" />
+	<Delete Files="$(OutputPath)ilmerge.msbuild.log" Condition="Exists('$(OutputPath)ilmerge.msbuild.log')" />
+	<Move SourceFiles="$(OutputPath)Merged\AsmSpy.exe" DestinationFolder="$(OutputPath)" Condition="Exists('$(OutputPath)Merged\AsmSpy.exe')" />
+	<Move SourceFiles="$(OutputPath)Merged\AsmSpy.pdb" DestinationFolder="$(OutputPath)" Condition="Exists('$(OutputPath)Merged\AsmSpy.pdb')" />
+	<Move SourceFiles="$(OutputPath)Merged\ilmerge.msbuild.log" DestinationFolder="$(OutputPath)" Condition="Exists('$(OutputPath)Merged\ilmerge.msbuild.log')" />
+	<RemoveDir Directories="$(OutputPath)Merged" Condition="Exists('$(OutputPath)Merged')" />
   </Target>
   <Target Name="AfterBuild">
     <CallTarget Targets="MergeExecutable" />

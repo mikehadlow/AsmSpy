@@ -1,10 +1,11 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 
 namespace AsmSpy
 {
     public interface IDependencyAnalyzer
     {
-        DependencyAnalyzerResult Analyze(ILogger logger);
-        DirectoryInfo DirectoryInfo { get; }
+        IDependencyAnalyzerResult Analyze(ILogger logger);
+        IEnumerable<FileInfo> Files { get; }
     }
 }

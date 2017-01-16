@@ -6,11 +6,11 @@ namespace AsmSpy.CommandLine
 {
     public class DgmlExport : IDependencyVisualizer
     {
-        private readonly DependencyAnalyzerResult _result;
+        private readonly IDependencyAnalyzerResult _result;
         private readonly string _exportFileName;
         private readonly ILogger _logger;
 
-        public DgmlExport(DependencyAnalyzerResult result, string exportFileName, ILogger logger)
+        public DgmlExport(IDependencyAnalyzerResult result, string exportFileName, ILogger logger)
         {
             _result = result;
             _exportFileName = exportFileName;

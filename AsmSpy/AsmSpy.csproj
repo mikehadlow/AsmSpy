@@ -80,7 +80,9 @@
     <Compile Include="DependencyAnalyzer.cs" />
     <Compile Include="DependencyAnalyzerResult.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="IAssemblyReferenceInfo.cs" />
     <Compile Include="IDependencyAnalyzer.cs" />
+    <Compile Include="IDependencyAnalyzerResult.cs" />
     <Compile Include="IDependencyVisualizer.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="Native\FileInfoExtensions.cs" />

@@ -4,22 +4,22 @@ using System.Reflection;
 
 namespace AsmSpy
 {
-    public class AssemblyReferenceInfo
+    public class AssemblyReferenceInfo : IAssemblyReferenceInfo
     {
         #region Fields
 
-        private readonly HashSet<AssemblyReferenceInfo> _references = new HashSet<AssemblyReferenceInfo>();
-        private readonly HashSet<AssemblyReferenceInfo> _referencedBy = new HashSet<AssemblyReferenceInfo>();
+        private readonly HashSet<IAssemblyReferenceInfo> _references = new HashSet<IAssemblyReferenceInfo>();
+        private readonly HashSet<IAssemblyReferenceInfo> _referencedBy = new HashSet<IAssemblyReferenceInfo>();
 
         #endregion
 
         #region Properties
 
-        public Assembly ReflectionOnlyAssembly { get; set; }
-        public AssemblySource AssemblySource { get; set; }
-        public AssemblyName AssemblyName { get; }
-        public ICollection<AssemblyReferenceInfo> ReferencedBy => _referencedBy.ToArray();
-        public ICollection<AssemblyReferenceInfo> References => _references.ToArray();
+        public virtual Assembly ReflectionOnlyAssembly { get; set; }
+        public virtual AssemblySource AssemblySource { get; set; }
+        public virtual AssemblyName AssemblyName { get; }
+        public virtual ICollection<IAssemblyReferenceInfo> ReferencedBy => _referencedBy.ToArray();
+        public virtual ICollection<IAssemblyReferenceInfo> References => _references.ToArray();
 
         #endregion
 
@@ -34,7 +34,7 @@ namespace AsmSpy
 
         #region Reference Support
 
-        public void AddReference(AssemblyReferenceInfo info)
+        public virtual void AddReference(IAssemblyReferenceInfo info)
         {
             if (!_references.Contains(info))
             {
@@ -42,7 +42,7 @@ namespace AsmSpy
             }
         }
 
-        public void AddReferencedBy(AssemblyReferenceInfo info)
+        public virtual void AddReferencedBy(IAssemblyReferenceInfo info)
         {
             if (!_referencedBy.Contains(info))
             {
@@ -61,7 +61,7 @@ namespace AsmSpy
 
         public override bool Equals(object obj)
         {
-            var info = obj as AssemblyReferenceInfo;
+            var info = obj as IAssemblyReferenceInfo;
             if (info == null)
             {
                 return false;

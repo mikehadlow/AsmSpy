@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using Microsoft.Extensions.CommandLineUtils;
 
 namespace AsmSpy.CommandLine
@@ -33,9 +34,12 @@ namespace AsmSpy.CommandLine
                 var onlyConflicts = !all.HasValue();
                 var skipSystem = nonsystem.HasValue();
 
-                IDependencyAnalyzer analyzer = new DependencyAnalyzer { DirectoryInfo = new DirectoryInfo(directoryPath) };
+                var directoryInfo = new DirectoryInfo(directoryPath);
+                var fileList = directoryInfo.GetFiles("*.dll").Concat(directoryInfo.GetFiles("*.exe"));
 
-                consoleLogger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Check assemblies in: {0}", analyzer.DirectoryInfo));
+                IDependencyAnalyzer analyzer = new DependencyAnalyzer(fileList);
+
+                consoleLogger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Check assemblies in: {0}", directoryInfo));
 
                 var result = analyzer.Analyze(consoleLogger);
 
@@ -50,7 +54,7 @@ namespace AsmSpy.CommandLine
                     return 0;
                 }
 
-                IDependencyVisualizer export = new DgmlExport(result, string.IsNullOrWhiteSpace(dgmlExport.Value()) ? Path.Combine(analyzer.DirectoryInfo.FullName, "references.dgml") : dgmlExport.Value(), consoleLogger);
+                IDependencyVisualizer export = new DgmlExport(result, string.IsNullOrWhiteSpace(dgmlExport.Value()) ? Path.Combine(directoryInfo.FullName, "references.dgml") : dgmlExport.Value(), consoleLogger);
                 export.Visualize();
 
                 return 0;

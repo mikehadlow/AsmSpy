@@ -14,7 +14,7 @@ namespace AsmSpy.CommandLine
 
         #region Fields
 
-        private readonly DependencyAnalyzerResult _analyzerResult;
+        private readonly IDependencyAnalyzerResult _analyzerResult;
 
         #endregion
 
@@ -29,7 +29,7 @@ namespace AsmSpy.CommandLine
 
         #region Constructor
 
-        public ConsoleVisualizer(DependencyAnalyzerResult result)
+        public ConsoleVisualizer(IDependencyAnalyzerResult result)
         {
             _analyzerResult = result;
         }

@@ -12,15 +12,15 @@ namespace AsmSpy
     {
         #region Properties
 
-        public DirectoryInfo DirectoryInfo { get; set; }
+        public virtual IEnumerable<FileInfo> Files { get; }
 
         #endregion
 
         #region Analyze Support
 
-        private IEnumerable<FileInfo> GetLibrariesAndExecutables()
+        public DependencyAnalyzer(IEnumerable<FileInfo> files)
         {
-            return DirectoryInfo.GetFiles("*.dll").Concat(DirectoryInfo.GetFiles("*.exe"));
+            Files = files;
         }
 
         private static AssemblyReferenceInfo GetAssemblyReferenceInfo(IDictionary<string, AssemblyReferenceInfo> assemblies, AssemblyName assemblyName)
@@ -37,13 +37,13 @@ namespace AsmSpy
         }
 
 
-        public DependencyAnalyzerResult Analyze(ILogger logger)
+        public virtual IDependencyAnalyzerResult Analyze(ILogger logger)
         {
             if (logger == null)
             {
                 throw new ArgumentNullException(nameof(logger));
             }
-            var result = new DependencyAnalyzerResult(GetLibrariesAndExecutables().ToArray());
+            var result = new DependencyAnalyzerResult(Files.ToArray());
 
 
             if (result.AnalyzedFiles.Count <= 0)
