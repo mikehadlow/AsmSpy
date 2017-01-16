@@ -42,13 +42,13 @@ namespace AsmSpy.CommandLine
         {
             if (_analyzerResult.AnalyzedFiles.Count <= 0)
             {
-                Console.WriteLine("No assemblies files found in directory");
+                Console.WriteLine(AsmSpy_CommandLine.No_assemblies_files_found_in_directory);
                 return;
             }
 
             if (OnlyConflicts)
             {
-                Console.WriteLine("Detailing only conflicting assembly references.");
+                Console.WriteLine(AsmSpy_CommandLine.Detailing_only_conflicting_assembly_references);
             }
 
             var assemblyGroups = _analyzerResult.Assemblies.Values.GroupBy(x => x.AssemblyName.Name);
@@ -66,16 +66,21 @@ namespace AsmSpy.CommandLine
                     continue;
                 }
 
-                if (!string.IsNullOrEmpty(ReferencedStartsWith) && !assemblyInfos.SelectMany(x => x.ReferencedBy).GroupBy(x => x.AssemblyName.Name.ToUpperInvariant().StartsWith(ReferencedStartsWith.ToUpperInvariant(), StringComparison.OrdinalIgnoreCase)).Any())
+
+                var referenced =
+                    assemblyInfos.SelectMany(x => x.ReferencedBy).GroupBy(
+                            x =>
+                                x.AssemblyName.Name).Where(x => x.Key.ToUpperInvariant().StartsWith(ReferencedStartsWith.ToUpperInvariant(), StringComparison.OrdinalIgnoreCase));
+                if (!string.IsNullOrEmpty(ReferencedStartsWith) && !referenced.Any())
                 {
                     continue;
                 }
 
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.Write("Reference: ");
-                    Console.ForegroundColor = GetMainNameColor(assemblyInfos);
-                Console.WriteLine("{0}", assemblyGroup.Key);
-                
+                Console.Write(AsmSpy_CommandLine.Reference);
+                Console.ForegroundColor = GetMainNameColor(assemblyInfos);
+                Console.WriteLine(AsmSpy_CommandLine.ConsoleVisualizer_Visualize__0_, assemblyGroup.Key);
+
                 foreach (var assemblyInfo in assemblyInfos)
                 {
                     VisualizeAssemblyReferenceInfo(assemblyInfo);
@@ -130,14 +135,14 @@ namespace AsmSpy.CommandLine
                     statusColor = AssemblyUnknownColor;
                     break;
                 default:
-                    throw new InvalidEnumArgumentException("Invalid AssemblySource");
+                    throw new InvalidEnumArgumentException(AsmSpy_CommandLine.Invalid_AssemblySource);
             }
             Console.ForegroundColor = statusColor;
-            Console.WriteLine("  {0}", assemblyReferenceInfo.AssemblyName);
-            Console.Write("  Source: {0}", assemblyReferenceInfo.AssemblySource);
+            Console.WriteLine(AsmSpy_CommandLine.ConsoleVisualizer_VisualizeAssemblyReferenceInfo____0_, assemblyReferenceInfo.AssemblyName);
+            Console.Write(AsmSpy_CommandLine.Source_, assemblyReferenceInfo.AssemblySource);
             if (assemblyReferenceInfo.AssemblySource != AssemblySource.NotFound)
             {
-                Console.WriteLine(", Location: {0}", assemblyReferenceInfo.ReflectionOnlyAssembly.Location);
+                Console.WriteLine(AsmSpy_CommandLine.Location_, assemblyReferenceInfo.ReflectionOnlyAssembly.Location);
             }
             else
             {
@@ -146,14 +151,19 @@ namespace AsmSpy.CommandLine
 
             foreach (var referer in assemblyReferenceInfo.ReferencedBy.OrderBy(x => x.AssemblyName.ToString()))
             {
+                if (!string.IsNullOrEmpty(ReferencedStartsWith) && !referer.AssemblyName.Name.ToUpperInvariant().StartsWith(ReferencedStartsWith.ToUpperInvariant(), StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
                 Console.ForegroundColor = statusColor;
-                Console.Write("    {0}", assemblyReferenceInfo.AssemblyName.Version);
+                Console.Write(AsmSpy_CommandLine.ConsoleVisualizer_VisualizeAssemblyReferenceInfo______0_, assemblyReferenceInfo.AssemblyName.Version);
 
                 Console.ForegroundColor = ConsoleColor.White;
-                Console.Write(" by ");
+                Console.Write(AsmSpy_CommandLine.by);
 
                 Console.ForegroundColor = ConsoleColor.Gray;
-                Console.WriteLine("{0}", referer.AssemblyName);
+                Console.WriteLine(AsmSpy_CommandLine.ConsoleVisualizer_VisualizeAssemblyReferenceInfo__0_, referer.AssemblyName);
             }
         }
 
