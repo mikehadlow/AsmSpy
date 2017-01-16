@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <!-- Read this before publishing packages to chocolatey.org: https://github.com/chocolatey/chocolatey/wiki/CreatePackages -->
+    <id>asmspy</id>
+    <title>AsmSpy</title>
+    <version>1.0.0</version>
+    <authors>Mike Hadlow, Rahul Nath</authors>
+    <owners>Mike Hadlow</owners>
+    <summary>Command line tool to view assembly references.</summary>
+    <description>AsmSpy is a Command line tool to view assembly references. It will output a list of all conflicting assembly references. That is where different assemblies in your bin folder reference different versions of the same assembly. 
+    </description>
+    <projectUrl>https://github.com/mikehadlow/AsmSpy</projectUrl>
+    <projectSourceUrl>https://github.com/mikehadlow/AsmSpy</projectSourceUrl>
+    <docsUrl>https://github.com/mikehadlow/AsmSpy/blob/master/README.md</docsUrl>
+    <bugTrackerUrl>https://github.com/mikehadlow/AsmSpy/issues</bugTrackerUrl>
+    <tags>asmspy console</tags>
+    <copyright>Copyright © Suteki Ltd</copyright>
+    <licenseUrl>https://github.com/mikehadlow/AsmSpy/blob/master/licence.txt</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <releaseNotes>Publishing to Chocolatey</releaseNotes>
+  </metadata>
+  <files>
+    <file src="bin\$configuration$\AsmSpy.exe" target="tools" />
+    <file src="License.txt" target="tools" />
+  </files>
+</package>
