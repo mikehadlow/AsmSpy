@@ -22,7 +22,7 @@
     <releaseNotes>Publishing to Chocolatey</releaseNotes>
   </metadata>
   <files>
-    <file src="bin\$configuration$\AsmSpy.exe" target="tools" />
+    <file src="bin\Debug\AsmSpy.exe" target="tools" />
     <file src="License.txt" target="tools" />
   </files>
 </package>
