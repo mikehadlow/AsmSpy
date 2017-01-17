@@ -8,8 +8,8 @@ after_build:
     7z a asmspy.zip .\AsmSpy.CommandLine\bin\Debug\AsmSpy.exe
 
     if defined APPVEYOR_REPO_TAG_NAME choco pack .\AsmSpy.CommandLine\AsmSpy.nuspec --version %APPVEYOR_REPO_TAG_NAME%
+
+    if defined APPVEYOR_REPO_TAG_NAME appveyor PushArtifact asmspy.%APPVEYOR_REPO_TAG_NAME%.nupkg -DeploymentName ReleaseNuget
 artifacts:
 - path: asmspy.zip
   name: Zip Package
-- path: '\*.nupkg'
-  name: Nuget Package
