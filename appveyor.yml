@@ -15,9 +15,3 @@ artifacts:
   name: Zip Package
 - path: '\AsmSpy.CommandLine\bin\*.nupkg'
   name: Nuget Package
-deploy:
-- provider: Environment
-  name: AsmSpy Chocolatey
-  on:
-    branch: master
-    APPVEYOR_REPO_TAG: true
