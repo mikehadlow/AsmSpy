@@ -4,7 +4,7 @@
     {
         NotFound,
         Local,
-        GAC,
+        GlobalAssemblyCache,
         Unknown
     }
 }

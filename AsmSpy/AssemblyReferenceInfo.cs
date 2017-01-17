@@ -1,27 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace AsmSpy
 {
-    public class AssemblyReferenceInfo
+    public class AssemblyReferenceInfo : IAssemblyReferenceInfo
     {
         #region Fields
 
-        HashSet<AssemblyReferenceInfo> _References = new HashSet<AssemblyReferenceInfo>();
-        HashSet<AssemblyReferenceInfo> _ReferencedBy = new HashSet<AssemblyReferenceInfo>();
+        private readonly HashSet<IAssemblyReferenceInfo> _references = new HashSet<IAssemblyReferenceInfo>();
+        private readonly HashSet<IAssemblyReferenceInfo> _referencedBy = new HashSet<IAssemblyReferenceInfo>();
 
         #endregion
 
         #region Properties
 
-        public Assembly ReflectionOnlyAssembly { get; set; }
-        public AssemblySource AssemblySource { get; set; }
-        public AssemblyName AssemblyName { get; private set; }
-        public AssemblyReferenceInfo[] ReferencedBy { get { return _ReferencedBy.ToArray(); } }
-        public AssemblyReferenceInfo[] References { get { return _References.ToArray(); } }
+        public virtual Assembly ReflectionOnlyAssembly { get; set; }
+        public virtual AssemblySource AssemblySource { get; set; }
+        public virtual AssemblyName AssemblyName { get; }
+        public virtual ICollection<IAssemblyReferenceInfo> ReferencedBy => _referencedBy.ToArray();
+        public virtual ICollection<IAssemblyReferenceInfo> References => _references.ToArray();
 
         #endregion
 
@@ -36,19 +34,19 @@ namespace AsmSpy
 
         #region Reference Support
 
-        public void AddReference(AssemblyReferenceInfo info)
+        public virtual void AddReference(IAssemblyReferenceInfo info)
         {
-            if (!_References.Contains(info))
+            if (!_references.Contains(info))
             {
-                _References.Add(info);
+                _references.Add(info);
             }
         }
 
-        public void AddReferencedBy(AssemblyReferenceInfo info)
+        public virtual void AddReferencedBy(IAssemblyReferenceInfo info)
         {
-            if (!_ReferencedBy.Contains(info))
+            if (!_referencedBy.Contains(info))
             {
-                _ReferencedBy.Add(info);
+                _referencedBy.Add(info);
             }
         }
 
@@ -63,7 +61,7 @@ namespace AsmSpy
 
         public override bool Equals(object obj)
         {
-            var info = obj as AssemblyReferenceInfo;
+            var info = obj as IAssemblyReferenceInfo;
             if (info == null)
             {
                 return false;

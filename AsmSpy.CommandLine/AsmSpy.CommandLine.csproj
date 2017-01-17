@@ -1,0 +1,126 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{87C71050-29D8-4D2B-AD59-9F950E659915}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AsmSpy.CommandLine</RootNamespace>
+    <AssemblyName>AsmSpy.CommandLine</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Extensions.CommandLineUtils, Version=1.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.CommandLineUtils.1.1.0\lib\net451\Microsoft.Extensions.CommandLineUtils.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AsmSpy.CommandLine.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AsmSpy.CommandLine.resx</DependentUpon>
+    </Compile>
+    <Compile Include="ConsoleLogger.cs" />
+    <Compile Include="ConsoleVisualizer.cs" />
+    <Compile Include="DgmlExport.cs" />
+    <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AsmSpy\AsmSpy.csproj">
+      <Project>{5acc768b-f9f7-4472-9ab9-2543e32fd1ed}</Project>
+      <Name>AsmSpy</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AsmSpy.CommandLine.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>AsmSpy.CommandLine.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <NuGetPackagesPath>$(SolutionDir)\packages</NuGetPackagesPath>
+  </PropertyGroup>
+  <Target Name="MergeExecutable" Inputs="$(OutputPath)\NuGet.Core.dll;$(OutputPath)\NuGet.exe" Outputs="$(OutputPath)Merged\Legoland.exe" Condition=" '$(OS)' == 'Windows_NT'">
+    <PropertyGroup>
+      <NuGetRoot>$(NuGetPackagesPath)</NuGetRoot>
+      <ILMergeExe>$(NuGetRoot)\ILMerge.2.14.1208\Tools\ILMerge.exe</ILMergeExe>
+      <ILMergeInternalizeIgnoreFile>$(MsBuildProjectDirectory)\ilmerge.internalize.ignore.txt</ILMergeInternalizeIgnoreFile>
+      <ILMergeOutputFile>AsmSpy.exe</ILMergeOutputFile>
+      <ILMergeOutputFilePath>$(OutputPath)$(ILMergeOutputFile)</ILMergeOutputFilePath>
+      <FrameworkPath>$(ProgramFiles)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2</FrameworkPath>
+      <FrameworkPath Condition="'$(MSBuildProgramFiles32)' != ''">$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2</FrameworkPath>
+      <ILMergeCommandArgs>/targetplatform:"v4, $(FrameworkPath)" /internalize:"$(ILMergeInternalizeIgnoreFile)" /target:exe /out:"Merged\$(ILMergeOutputFile)" /log:"Merged\ilmerge.msbuild.log" /allowDup AsmSpy.CommandLine.exe AsmSpy.dll Microsoft.Extensions.CommandLineUtils.dll</ILMergeCommandArgs>
+    </PropertyGroup>
+    <ItemGroup>
+      <ILMergeItems Include="$(OutputPath)\*.dll;$(OutputPath)\*.exe" />
+    </ItemGroup>
+    <MakeDir Directories="$(OutputPath)Merged" Condition="!Exists('$(OutputPath)Merged')" />
+    <Delete Files="$(ILMergeOutputFilePath)" Condition="Exists($(ILMergeOutputFilePath))" />
+    <!-- ILMerge does not yet support .NET 4.0  http://nitoprograms.blogspot.com/2010/09/using-ilmerge-with-net-40-andor-rx.html /targetplatform:v4,"%ProgramFiles%\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.0" -->
+    <Error Condition="!Exists('$(FrameworkPath)')" Text="Could not find 4.0 reference assemblies in $(FrameworkPath)" />
+    <Exec Command="&quot;$(ILMergeExe)&quot; $(ILMergeCommandArgs)" WorkingDirectory="$(OutputPath)" />
+    <Delete Files="$(OutputPath)AsmSpy.exe" Condition="Exists('$(OutputPath)AsmSpy.exe')" />
+    <Delete Files="$(OutputPath)AsmSpy.pdb" Condition="Exists('$(OutputPath)AsmSpy.pdb')" />
+    <Delete Files="$(OutputPath)ilmerge.msbuild.log" Condition="Exists('$(OutputPath)ilmerge.msbuild.log')" />
+    <Move SourceFiles="$(OutputPath)Merged\AsmSpy.exe" DestinationFolder="$(OutputPath)" Condition="Exists('$(OutputPath)Merged\AsmSpy.exe')" />
+    <Move SourceFiles="$(OutputPath)Merged\AsmSpy.pdb" DestinationFolder="$(OutputPath)" Condition="Exists('$(OutputPath)Merged\AsmSpy.pdb')" />
+    <Move SourceFiles="$(OutputPath)Merged\ilmerge.msbuild.log" DestinationFolder="$(OutputPath)" Condition="Exists('$(OutputPath)Merged\ilmerge.msbuild.log')" />
+    <RemoveDir Directories="$(OutputPath)Merged" Condition="Exists('$(OutputPath)Merged')" />
+  </Target>
+  <Target Name="AfterBuild">
+    <CallTarget Targets="MergeExecutable" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

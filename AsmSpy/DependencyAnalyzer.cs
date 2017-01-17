@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using AsmSpy.Native;
 
 namespace AsmSpy
@@ -12,44 +12,48 @@ namespace AsmSpy
     {
         #region Properties
 
-        public DirectoryInfo DirectoryInfo { get; set; }
+        public virtual IEnumerable<FileInfo> Files { get; }
 
         #endregion
 
         #region Analyze Support
 
-        private IEnumerable<FileInfo> GetLibrariesAndExecutables()
+        public DependencyAnalyzer(IEnumerable<FileInfo> files)
         {
-            return DirectoryInfo.GetFiles("*.dll").Concat(DirectoryInfo.GetFiles("*.exe"));
+            Files = files;
         }
 
-        private AssemblyReferenceInfo GetAssemblyReferenceInfo(IDictionary<string, AssemblyReferenceInfo> assemblies, AssemblyName assemblyName)
+        private static AssemblyReferenceInfo GetAssemblyReferenceInfo(IDictionary<string, AssemblyReferenceInfo> assemblies, AssemblyName assemblyName)
         {
             AssemblyReferenceInfo assemblyReferenceInfo;
-            if (!assemblies.TryGetValue(assemblyName.FullName, out assemblyReferenceInfo))
+            if (assemblies.TryGetValue(assemblyName.FullName, out assemblyReferenceInfo))
             {
-                assemblyReferenceInfo = new AssemblyReferenceInfo(assemblyName);
-                assemblies.Add(assemblyName.FullName, assemblyReferenceInfo);
+                return assemblyReferenceInfo;
             }
+
+            assemblyReferenceInfo = new AssemblyReferenceInfo(assemblyName);
+            assemblies.Add(assemblyName.FullName, assemblyReferenceInfo);
             return assemblyReferenceInfo;
         }
 
 
-        public DependencyAnalyzerResult Analyze(ILogger logger)
+        public virtual IDependencyAnalyzerResult Analyze(ILogger logger)
         {
-            var result = new DependencyAnalyzerResult();
+            if (logger == null)
+            {
+                throw new ArgumentNullException(nameof(logger));
+            }
+            var result = new DependencyAnalyzerResult(Files.ToArray());
 
-            result.AnalyzedFiles = GetLibrariesAndExecutables().ToArray();
 
-            if (result.AnalyzedFiles.Length <= 0)
+            if (result.AnalyzedFiles.Count <= 0)
             {
                 return result;
             }
 
-            result.Assemblies = new Dictionary<string, AssemblyReferenceInfo>(StringComparer.OrdinalIgnoreCase);
             foreach (var fileInfo in result.AnalyzedFiles.OrderBy(asm => asm.Name))
             {
-                logger.LogMessage(string.Format("Checking file {0}", fileInfo.Name));
+                logger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Checking file {0}", fileInfo.Name));
                 Assembly assembly;
                 try
                 {
@@ -61,7 +65,7 @@ namespace AsmSpy
                 }
                 catch (Exception ex)
                 {
-                    logger.LogWarning(string.Format("Failed to load assembly '{0}': {1}", fileInfo.FullName, ex.Message));
+                    logger.LogWarning(string.Format(CultureInfo.InvariantCulture, "Failed to load assembly '{0}': {1}", fileInfo.FullName, ex.Message));
                     continue;
                 }
                 var assemblyReferenceInfo = GetAssemblyReferenceInfo(result.Assemblies, assembly.GetName());
@@ -69,7 +73,7 @@ namespace AsmSpy
                 assemblyReferenceInfo.AssemblySource = AssemblySource.Local;
                 foreach (var referencedAssembly in assembly.GetReferencedAssemblies())
                 {
-                    var referencedAssemblyReferenceInfo = GetAssemblyReferenceInfo(result.Assemblies, referencedAssembly); ;
+                    var referencedAssemblyReferenceInfo = GetAssemblyReferenceInfo(result.Assemblies, referencedAssembly);
                     assemblyReferenceInfo.AddReference(referencedAssemblyReferenceInfo);
                     referencedAssemblyReferenceInfo.AddReferencedBy(assemblyReferenceInfo);
                 }
@@ -81,13 +85,13 @@ namespace AsmSpy
                 {
                     continue;
                 }
-                logger.LogMessage(string.Format("Checking reference {0}", assembly.AssemblyName.Name));
+                logger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Checking reference {0}", assembly.AssemblyName.Name));
                 try
                 {
                     assembly.ReflectionOnlyAssembly = Assembly.ReflectionOnlyLoad(assembly.AssemblyName.FullName);
-                    assembly.AssemblySource = assembly.ReflectionOnlyAssembly.GlobalAssemblyCache ? AssemblySource.GAC : AssemblySource.Unknown;
+                    assembly.AssemblySource = assembly.ReflectionOnlyAssembly.GlobalAssemblyCache ? AssemblySource.GlobalAssemblyCache : AssemblySource.Unknown;
                 }
-                catch (Exception ex)
+                catch
                 {
                     // TODO: Show message?
                 }
