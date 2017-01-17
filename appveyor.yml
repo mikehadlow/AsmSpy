@@ -11,5 +11,5 @@ after_build:
 artifacts:
 - path: asmspy.zip
   name: Zip Package
-- path: '\AsmSpy.nupkg'
+- path: '\*.nupkg'
   name: Nuget Package
