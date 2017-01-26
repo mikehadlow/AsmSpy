@@ -18,11 +18,11 @@ after_build:
     
     choco pack .\AsmSpy.CommandLine\AsmSpy.nuspec --version %APPVEYOR_BUILD_VERSION%
 
-    appveyor PushArtifact asmspy.%APPVEYOR_BUILD_VERSION%.nupkg -DeploymentName ReleaseChoco
+    appveyor PushArtifact asmspy.%APPVEYOR_BUILD_VERSION%.nupkg -DeploymentName ReleaseNuGet
     
     nuget pack .\AsmSpy.Core\AsmSpy.Core.nuspec -version %APPVEYOR_BUILD_VERSION%
 
-    appveyor PushArtifact AsmSpy.Core.%APPVEYOR_BUILD_VERSION%.nupkg -DeploymentName ReleaseNuGet
+    appveyor PushArtifact AsmSpy.Core.%APPVEYOR_BUILD_VERSION%.nupkg -DeploymentName AsmSpy.Core
 deploy:
 - provider: Environment
   name: AsmSpy Chocolatey
