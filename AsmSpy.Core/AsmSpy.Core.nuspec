@@ -17,7 +17,7 @@
     <releaseNotes>Publishing to Nuget</releaseNotes>
   </metadata>
   <files>
-    <file src="bin\Debug\AsmSpy.Core.dll" target="lib" />
+    <file src="bin\Debug\AsmSpy.Core.dll" target="lib\net462" />
     <file src="License.txt" target="tools" />
   </files>
 </package>
