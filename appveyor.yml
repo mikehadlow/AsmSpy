@@ -12,12 +12,14 @@ build:
   verbosity: minimal
 after_build:
 - cmd: >-
-    7z a asmspy.zip .\AsmSpy.CommandLine\bin\Debug\AsmSpy.exe
+    7z a asmspy.%APPVEYOR_BUILD_VERSION%.zip .\AsmSpy.CommandLine\bin\Debug\AsmSpy.exe
 
+    appveyor PushArtifact asmspy.%APPVEYOR_BUILD_VERSION%.zip -DeploymentName ReleaseZip
+    
     choco pack .\AsmSpy.CommandLine\AsmSpy.nuspec --version %APPVEYOR_BUILD_VERSION%
 
     appveyor PushArtifact asmspy.%APPVEYOR_BUILD_VERSION%.nupkg -DeploymentName ReleaseChoco
     
-    nuget pack .\AsmSpy\AsmSpy.nuspec -version %APPVEYOR_BUILD_VERSION%
+    nuget pack .\AsmSpy.Core\AsmSpy.Core.nuspec -version %APPVEYOR_BUILD_VERSION%
 
-    appveyor PushArtifact asmspy.%APPVEYOR_BUILD_VERSION%.nupkg -DeploymentName ReleaseNuGet
+    appveyor PushArtifact AsmSpy.Core.%APPVEYOR_BUILD_VERSION%.nupkg -DeploymentName ReleaseNuGet

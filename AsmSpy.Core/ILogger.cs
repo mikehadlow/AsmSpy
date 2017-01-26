@@ -1,4 +1,4 @@
-﻿namespace AsmSpy
+﻿namespace AsmSpy.Core
 {
     public interface ILogger
     {

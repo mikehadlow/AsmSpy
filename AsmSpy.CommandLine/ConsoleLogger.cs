@@ -1,4 +1,5 @@
 ﻿using System;
+using AsmSpy.Core;
 
 namespace AsmSpy.CommandLine
 {

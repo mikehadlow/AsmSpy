@@ -4,9 +4,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using AsmSpy.Native;
+using AsmSpy.Core.Native;
 
-namespace AsmSpy
+namespace AsmSpy.Core
 {
     public class DependencyAnalyzer : IDependencyAnalyzer
     {

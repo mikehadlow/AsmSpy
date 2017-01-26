@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace AsmSpy
+namespace AsmSpy.Core
 {
     public class DependencyAnalyzerResult : IDependencyAnalyzerResult
     {

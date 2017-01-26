@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Reflection;
 
-namespace AsmSpy
+namespace AsmSpy.Core
 {
     public interface IAssemblyReferenceInfo
     {

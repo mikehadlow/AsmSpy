@@ -1,10 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata minClientVersion="2.8">
-    <id>asmspy</id>
-    <title>AsmSpy</title>
+    <id>AsmSpy.Core</id>
+    <title>AsmSpy.Core</title>
     <version>1.0.0</version>
-    <description>AsmSpy is a set of libraries to view assembly reference info.</description>
+    <description>AsmSpy.Core is a set of libraries to view assembly reference info.</description>
 	<authors>Mike Hadlow, Rahul Nath</authors>
     <owners>Mike Hadlow</owners>
     <projectUrl>https://github.com/mikehadlow/AsmSpy</projectUrl>
@@ -13,11 +13,11 @@
 	<developmentDependency>true</developmentDependency>
 	<summary>Basic libraries for viewing assembly references.</summary>
     <copyright>Copyright © Suteki Ltd</copyright>
-    <tags>asmspy console</tags>
+    <tags>asmspy core</tags>
     <releaseNotes>Publishing to Nuget</releaseNotes>
   </metadata>
   <files>
-    <file src="bin\Debug\AsmSpy.dll" target="lib" />
+    <file src="bin\Debug\AsmSpy.Core.dll" target="lib" />
     <file src="License.txt" target="tools" />
   </files>
 </package>

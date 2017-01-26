@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace AsmSpy.Native
+namespace AsmSpy.Core.Native
 {
     [StructLayout(LayoutKind.Explicit)]
     internal struct ImageDosHeader

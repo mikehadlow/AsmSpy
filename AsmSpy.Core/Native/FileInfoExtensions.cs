@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace AsmSpy.Native
+namespace AsmSpy.Core.Native
 {
     internal static class FileInfoExtensions
     {

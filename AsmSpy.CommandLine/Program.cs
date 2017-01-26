@@ -2,7 +2,9 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using AsmSpy.Core;
 using Microsoft.Extensions.CommandLineUtils;
+
 
 namespace AsmSpy.CommandLine
 {
