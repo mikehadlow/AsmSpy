@@ -16,15 +16,8 @@ after_build:
 
     choco pack .\AsmSpy.CommandLine\AsmSpy.nuspec --version %APPVEYOR_BUILD_VERSION%
 
-    appveyor PushArtifact .\AsmSpy.CommandLine\asmspy.%APPVEYOR_BUILD_VERSION%.nupkg -DeploymentName ReleaseChoco
+    appveyor PushArtifact asmspy.%APPVEYOR_BUILD_VERSION%.nupkg -DeploymentName ReleaseChoco
     
     nuget pack .\AsmSpy\AsmSpy.nuspec -version %APPVEYOR_BUILD_VERSION%
 
-    appveyor PushArtifact .\AsmSpy\asmspy.%APPVEYOR_BUILD_VERSION%.nupkg -DeploymentName ReleaseNuGet
-artifacts:
-- path: asmspy.%APPVEYOR_BUILD_VERSION%.zip
-  name: Zip Package
-- path: '\AsmSpy.CommandLine\asmspy.%APPVEYOR_BUILD_VERSION%.nupkg'
-  name: Chocolatey Package
-- path: '\AsmSpy\asmspy.%APPVEYOR_BUILD_VERSION%.nupkg'
-  name: NuGet Package
+    appveyor PushArtifact asmspy.%APPVEYOR_BUILD_VERSION%.nupkg -DeploymentName ReleaseNuGet
