@@ -1,15 +1,32 @@
-version: 1.0.{build}
+version: 1.3.{build}
 before_build:
   - nuget restore
+# enable patching of AssemblyInfo.* files
+assembly_info:
+  patch: true
+  file: AssemblyInfo.*
+  assembly_version: "1.3.{build}"
+  assembly_file_version: "{version}"
+  assembly_informational_version: "{version}"
 build:
   verbosity: minimal
 after_build:
 - cmd: >-
-    7z a asmspy.zip .\AsmSpy.CommandLine\bin\Debug\AsmSpy.exe
+	7z a asmspy.{version}.zip .\AsmSpy.CommandLine\bin\Debug\AsmSpy.exe
 
-    if defined APPVEYOR_REPO_TAG_NAME choco pack .\AsmSpy.CommandLine\AsmSpy.nuspec --version %APPVEYOR_REPO_TAG_NAME%
-
-    if defined APPVEYOR_REPO_TAG_NAME appveyor PushArtifact asmspy.%APPVEYOR_REPO_TAG_NAME%.nupkg -DeploymentName ReleaseChoco
+	choco pack .\AsmSpy.CommandLine\AsmSpy.nuspec --version {version}
+	
+	nuget pack .\AsmSpy\AsmSpy.nuspec -version {version}
 artifacts:
-- path: asmspy.zip
+- path: asmspy.{version}.zip
   name: Zip Package
+- path: '\AsmSpy.CommandLine\asmspy.{version}.nupkg'
+  name: Chocolatey Package
+- path: '\AsmSpy\asmspy.{version}.nupkg'
+  name: NuGet Package
+deploy:
+- provider: Environment
+  name: AsmSpy Chocolatey
+  on:
+	branch: master
+	APPVEYOR_REPO_TAG: true
