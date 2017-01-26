@@ -12,11 +12,11 @@ build:
   verbosity: minimal
 after_build:
 - cmd: >-
-	7z a asmspy.{version}.zip .\AsmSpy.CommandLine\bin\Debug\AsmSpy.exe
+    7z a asmspy.{version}.zip .\AsmSpy.CommandLine\bin\Debug\AsmSpy.exe
 
-	choco pack .\AsmSpy.CommandLine\AsmSpy.nuspec --version {version}
+    choco pack .\AsmSpy.CommandLine\AsmSpy.nuspec --version {version}
 	
-	nuget pack .\AsmSpy\AsmSpy.nuspec -version {version}
+    nuget pack .\AsmSpy\AsmSpy.nuspec -version {version}
 artifacts:
 - path: asmspy.{version}.zip
   name: Zip Package
