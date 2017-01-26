@@ -11,12 +11,16 @@ assembly_info:
 build:
   verbosity: minimal
 after_build:
-- cmd: >- 
-    7z a asmspy.{version}.zip .\AsmSpy.CommandLine\bin\Debug\AsmSpy.exe
+- cmd: >-
+    7z a asmspy.zip .\AsmSpy.CommandLine\bin\Debug\AsmSpy.exe
 
-    choco pack .\AsmSpy.CommandLine\AsmSpy.nuspec --version {version}
-	
-    nuget pack .\AsmSpy\AsmSpy.nuspec -version {version}
+    choco pack .\AsmSpy.CommandLine\AsmSpy.nuspec --version %APPVEYOR_BUILD_VERSION%
+
+    appveyor PushArtifact asmspy.%APPVEYOR_BUILD_VERSION%.nupkg -DeploymentName ReleaseChoco
+    
+    nuget pack .\AsmSpy\AsmSpy.nuspec -version %APPVEYOR_BUILD_VERSION%
+
+    appveyor PushArtifact asmspy.%APPVEYOR_BUILD_VERSION%.nupkg -DeploymentName ReleaseChoco
 artifacts:
 - path: asmspy.{version}.zip
   name: Zip Package
@@ -24,9 +28,3 @@ artifacts:
   name: Chocolatey Package
 - path: '\AsmSpy\asmspy.{version}.nupkg'
   name: NuGet Package
-deploy:
-- provider: Environment
-  name: AsmSpy Chocolatey
-  on:
-	branch: master
-	APPVEYOR_REPO_TAG: true
