@@ -23,3 +23,9 @@ after_build:
     nuget pack .\AsmSpy.Core\AsmSpy.Core.nuspec -version %APPVEYOR_BUILD_VERSION%
 
     appveyor PushArtifact AsmSpy.Core.%APPVEYOR_BUILD_VERSION%.nupkg -DeploymentName ReleaseNuGet
+deploy:
+- provider: Environment
+  name: AsmSpy Chocolatey
+  on:
+    branch: master
+    APPVEYOR_REPO_TAG: true
