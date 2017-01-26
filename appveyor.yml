@@ -11,7 +11,7 @@ assembly_info:
 build:
   verbosity: minimal
 after_build:
-- cmd: >-
+- cmd: >- 
     7z a asmspy.{version}.zip .\AsmSpy.CommandLine\bin\Debug\AsmSpy.exe
 
     choco pack .\AsmSpy.CommandLine\AsmSpy.nuspec --version {version}
