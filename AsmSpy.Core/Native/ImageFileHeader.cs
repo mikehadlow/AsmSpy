@@ -1,4 +1,4 @@
-﻿namespace AsmSpy.Native
+﻿namespace AsmSpy.Core.Native
 {
     internal struct ImageFileHeader
     {

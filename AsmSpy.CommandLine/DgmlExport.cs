@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.IO;
 using System.Text;
+using AsmSpy.Core;
 
 namespace AsmSpy.CommandLine
 {

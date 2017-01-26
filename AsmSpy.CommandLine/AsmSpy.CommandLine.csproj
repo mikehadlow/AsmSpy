@@ -71,9 +71,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AsmSpy\AsmSpy.csproj">
+    <ProjectReference Include="..\AsmSpy.Core\AsmSpy.Core.csproj">
       <Project>{5acc768b-f9f7-4472-9ab9-2543e32fd1ed}</Project>
-      <Name>AsmSpy</Name>
+      <Name>AsmSpy.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -95,7 +95,7 @@
       <ILMergeOutputFilePath>$(OutputPath)$(ILMergeOutputFile)</ILMergeOutputFilePath>
       <FrameworkPath>$(ProgramFiles)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2</FrameworkPath>
       <FrameworkPath Condition="'$(MSBuildProgramFiles32)' != ''">$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2</FrameworkPath>
-      <ILMergeCommandArgs>/targetplatform:"v4, $(FrameworkPath)" /internalize:"$(ILMergeInternalizeIgnoreFile)" /target:exe /out:"Merged\$(ILMergeOutputFile)" /log:"Merged\ilmerge.msbuild.log" /allowDup AsmSpy.CommandLine.exe AsmSpy.dll Microsoft.Extensions.CommandLineUtils.dll</ILMergeCommandArgs>
+      <ILMergeCommandArgs>/targetplatform:"v4, $(FrameworkPath)" /internalize:"$(ILMergeInternalizeIgnoreFile)" /target:exe /out:"Merged\$(ILMergeOutputFile)" /log:"Merged\ilmerge.msbuild.log" /allowDup AsmSpy.CommandLine.exe AsmSpy.Core.dll Microsoft.Extensions.CommandLineUtils.dll</ILMergeCommandArgs>
     </PropertyGroup>
     <ItemGroup>
       <ILMergeItems Include="$(OutputPath)\*.dll;$(OutputPath)\*.exe" />

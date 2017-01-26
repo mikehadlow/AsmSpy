@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Reflection;
 
-namespace AsmSpy
+namespace AsmSpy.Core
 {
     public class AssemblyReferenceInfo : IAssemblyReferenceInfo
     {
