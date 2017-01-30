@@ -29,3 +29,8 @@ deploy:
   on:
     branch: master
     APPVEYOR_REPO_TAG: true
+- provider: Environment
+  name: AsmSpy Nuget
+  on:
+    branch: master
+    APPVEYOR_REPO_TAG: true
