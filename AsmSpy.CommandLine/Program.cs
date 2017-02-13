@@ -15,7 +15,7 @@ namespace AsmSpy.CommandLine
             var commandLineApplication = new CommandLineApplication(false);
             var directory = commandLineApplication.Argument("directory", "The directory to search for assemblies");
             var dgmlExport = commandLineApplication.Option("-dg|--dgml <filename>", "Export to a dgml file", CommandOptionType.SingleValue);
-            var nonsystem = commandLineApplication.Option("-n|--nonsystem", "List system assemblies", CommandOptionType.NoValue);
+            var nonsystem = commandLineApplication.Option("-n|--nonsystem", "Ignore 'System' assemblies", CommandOptionType.NoValue);
             var all = commandLineApplication.Option("-a|--all", "List all assemblies and references.", CommandOptionType.NoValue);
             var noconsole = commandLineApplication.Option("-nc|--noconsole", "Do not show references on console.", CommandOptionType.NoValue);
             var silent = commandLineApplication.Option("-s|--silent", "Do not show any message, only warnings and errors will be shown.", CommandOptionType.NoValue);
