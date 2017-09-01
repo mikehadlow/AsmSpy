@@ -63,9 +63,15 @@ namespace AsmSpy.CommandLine
             });
             try
             {
-                if (args == null || args.Length == 0)
+                if (args.Length < 1)
                 {
                     commandLineApplication.ShowHelp();
+
+                    Console.WriteLine("Enter path to your project bin folder containing dependencies to check.");
+                    string input = Console.ReadLine();
+
+                    args = new string[] { input };
+                    commandLineApplication.Execute(args);
                 }
                 else
                 {
@@ -77,6 +83,9 @@ namespace AsmSpy.CommandLine
                 Console.WriteLine(cpe.Message);
                 commandLineApplication.ShowHelp();
             }
+
+            Console.ReadKey();
         }
+
     }
 }
