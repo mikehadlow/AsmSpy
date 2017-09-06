@@ -59,6 +59,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AsmSpy.CommandLine.resx</DependentUpon>
     </Compile>
+    <Compile Include="BindingRedirectExport.cs" />
     <Compile Include="ConsoleLogger.cs" />
     <Compile Include="ConsoleVisualizer.cs" />
     <Compile Include="DgmlExport.cs" />
