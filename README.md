@@ -30,6 +30,7 @@ It will output a list of all conflicting assembly references. That is where diff
 | silent | do not show any output, only warnings and errors will be shown.<br> Supported formats:  -s, --silent |
 | dgml | export dependancy graph to a dgml file.<br> Supported formats:  -dg \<filename\>, --silent \<filename\> |
 | rsw | Will only analyze assemblies if their referenced assemblies starts with the given value.<br> Supported formats:  -rsw \<string\>, --referencedstartswith \<string\> |
+| i | include subdirectories in search.<br> Supported formats:  -i, --includesub |
 
 ### Examples
 To see a list of all assemblies and all references, just add the 'all' flag:
