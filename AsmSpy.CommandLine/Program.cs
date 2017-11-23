@@ -21,6 +21,7 @@ namespace AsmSpy.CommandLine
             var silent = commandLineApplication.Option("-s|--silent", "Do not show any message, only warnings and errors will be shown.", CommandOptionType.NoValue);
             var bindingRedirect = commandLineApplication.Option("-b|--bindingredirect", "Create binding-redirects", CommandOptionType.NoValue);
             var referencedStartsWith = commandLineApplication.Option("-rsw|--referencedstartswith", "Referenced Assembly should start with <string>. Will only analyze assemblies if their referenced assemblies starts with the given value.", CommandOptionType.SingleValue);
+            var includeSubDirectories = commandLineApplication.Option("-i|--includesub", "Include subdirectories in search", CommandOptionType.NoValue);
 
             commandLineApplication.HelpOption("-? | -h | --help");
             commandLineApplication.OnExecute(() =>
@@ -36,9 +37,10 @@ namespace AsmSpy.CommandLine
 
                 var onlyConflicts = !all.HasValue();
                 var skipSystem = nonsystem.HasValue();
+                var searchPattern = includeSubDirectories.HasValue() ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
 
                 var directoryInfo = new DirectoryInfo(directoryPath);
-                var fileList = directoryInfo.GetFiles("*.dll").Concat(directoryInfo.GetFiles("*.exe"));
+                var fileList = directoryInfo.GetFiles("*.dll", searchPattern).Concat(directoryInfo.GetFiles("*.exe", searchPattern));
 
                 IDependencyAnalyzer analyzer = new DependencyAnalyzer(fileList);
 
