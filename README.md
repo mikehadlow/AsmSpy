@@ -67,3 +67,7 @@ Color coding is used to more easily distinguish any problems.
 * Green - referenced assembly found locally, in the specified directory
 * Yellow - referenced assembly not found locally, but found installed in the [Global Assembly Cache](https://msdn.microsoft.com/en-us/library/yf1d93sz(v=vs.110).aspx)
 * Red - referenced assembly missing
+
+### Configure AspSpy as an external tool in Visual Studio
+
+[Blog post here](http://mikehadlow.blogspot.co.uk/2018/01/configure-asmspy-as-external-tool-in.html)
