@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace AsmSpy.CommandLine
         public static void Main(string[] args)
         {
             var commandLineApplication = new CommandLineApplication(false);
-            var directory = commandLineApplication.Argument("directory", "The directory to search for assemblies");
+            var directoryOrFile = commandLineApplication.Argument("directoryOrFile", "The directory to search for assemblies or file path to a single assembly");
             var dgmlExport = commandLineApplication.Option("-dg|--dgml <filename>", "Export to a dgml file", CommandOptionType.SingleValue);
             var nonsystem = commandLineApplication.Option("-n|--nonsystem", "Ignore 'System' assemblies", CommandOptionType.NoValue);
             var all = commandLineApplication.Option("-a|--all", "List all assemblies and references.", CommandOptionType.NoValue);
@@ -28,11 +29,22 @@ namespace AsmSpy.CommandLine
             {
                 var consoleLogger = new ConsoleLogger(!silent.HasValue());
 
-                var directoryPath = directory.Value;
-                if (!Directory.Exists(directoryPath))
+                var directoryOrFilePath = directoryOrFile.Value;
+                var directoryPath = directoryOrFile.Value;
+
+                if (!File.Exists(directoryOrFilePath) && !Directory.Exists(directoryOrFilePath))
                 {
-                    consoleLogger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Directory: '{0}' does not exist.", directoryPath));
+                    consoleLogger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Directory or file: '{0}' does not exist.", directoryOrFilePath));
                     return -1;
+                }
+
+                var isFilePathProvided = false;
+                var fileName = "";
+                if (File.Exists(directoryOrFilePath))
+                {
+                    isFilePathProvided = true;
+                    fileName = Path.GetFileName(directoryOrFilePath);
+                    directoryPath = Path.GetDirectoryName(directoryOrFilePath);
                 }
 
                 var onlyConflicts = !all.HasValue();
@@ -40,11 +52,20 @@ namespace AsmSpy.CommandLine
                 var searchPattern = includeSubDirectories.HasValue() ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
 
                 var directoryInfo = new DirectoryInfo(directoryPath);
-                var fileList = directoryInfo.GetFiles("*.dll", searchPattern).Concat(directoryInfo.GetFiles("*.exe", searchPattern));
 
+                List<FileInfo> fileList;
+                if (isFilePathProvided)
+                {
+                    fileList = directoryInfo.GetFiles(fileName, SearchOption.TopDirectoryOnly).ToList();
+                    consoleLogger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Check assemblies referenced in: {0}", directoryOrFilePath));
+                }
+                else
+                {
+                    fileList = directoryInfo.GetFiles("*.dll", searchPattern).Concat(directoryInfo.GetFiles("*.exe", searchPattern)).ToList();
+                    consoleLogger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Check assemblies in: {0}", directoryInfo));
+                }
+                
                 IDependencyAnalyzer analyzer = new DependencyAnalyzer(fileList);
-
-                consoleLogger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Check assemblies in: {0}", directoryInfo));
 
                 var result = analyzer.Analyze(consoleLogger);
 

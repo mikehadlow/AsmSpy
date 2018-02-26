@@ -36,7 +36,11 @@ It will output a list of all conflicting assembly references. That is where diff
 To see a list of all assemblies and all references, just add the 'all' flag:
 
     AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin --all
-    
+
+To check only a single assembly provde a path to the file:
+
+    AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin\Suteki.Shop.dll
+
 To ignore system assemblies, add the 'nonsystem' flag.
 
 The output looks something like this:
