@@ -28,7 +28,7 @@ It will output a list of all conflicting assembly references. That is where diff
 | nonsystem | ignore system assemblies. <br> Supported formats:  -n, --nonsystem |
 | noconsole | do not show reference output on console.<br> Supported formats:  -nc, --noconsole |
 | silent | do not show any output, only warnings and errors will be shown.<br> Supported formats:  -s, --silent |
-| dgml | export dependancy graph to a dgml file.<br> Supported formats:  -dg \<filename\>, --silent \<filename\> |
+| dgml | export dependency graph to a dgml file.<br> Supported formats:  -dg \<filename\>, --silent \<filename\> |
 | rsw | Will only analyze assemblies if their referenced assemblies starts with the given value.<br> Supported formats:  -rsw \<string\>, --referencedstartswith \<string\> |
 | i | include subdirectories in search.<br> Supported formats:  -i, --includesub |
 
@@ -37,7 +37,7 @@ To see a list of all assemblies and all references, just add the 'all' flag:
 
     AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin --all
 
-To check only a single assembly provde a path to the file:
+To check only a single assembly provide a path to the file:
 
     AsmSpy D:\Source\sutekishop\Suteki.Shop\Suteki.Shop\bin\Suteki.Shop.dll
 
@@ -72,6 +72,6 @@ Color coding is used to more easily distinguish any problems.
 * Yellow - referenced assembly not found locally, but found installed in the [Global Assembly Cache](https://msdn.microsoft.com/en-us/library/yf1d93sz(v=vs.110).aspx)
 * Red - referenced assembly missing
 
-### Configure AspSpy as an external tool in Visual Studio
+### Configure AsmSpy as an external tool in Visual Studio
 
 [Blog post here](http://mikehadlow.blogspot.co.uk/2018/01/configure-asmspy-as-external-tool-in.html)
