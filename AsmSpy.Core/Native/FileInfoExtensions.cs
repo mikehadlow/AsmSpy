@@ -4,21 +4,27 @@ namespace AsmSpy.Core.Native
 {
     internal static class FileInfoExtensions
     {
+        private const int PageSize = 4096;
+
         internal static bool IsAssembly(this FileInfo fileInfo)
         {
-            if (fileInfo.Length < 4096)
+            // Symbolic links always have a length of 0, which is the length of the symbolic link file (not the target file).
+            // After we read the first page of the file we check we actually got a page, so we can skip the check here safely.
+            if (fileInfo.Length < PageSize && !fileInfo.IsSymbolicLink())
             {
                 return false;
             }
-            var data = new byte[4096];
+
+            var data = new byte[PageSize];
             using (var fs = File.Open(fileInfo.FullName, FileMode.Open, FileAccess.Read))
             {
-                var iRead = fs.Read(data, 0, 4096);
-                if (iRead != 4096)
+                var iRead = fs.Read(data, 0, PageSize);
+                if (iRead != PageSize)
                 {
                     return false;
                 }
             }
+
             unsafe
             {
                 fixed (byte* pData = data)
@@ -43,6 +49,11 @@ namespace AsmSpy.Core.Native
                 }
             }
             return true;
+        }
+
+        internal static bool IsSymbolicLink(this FileInfo fileInfo)
+        {
+            return fileInfo.Attributes.HasFlag(FileAttributes.ReparsePoint);
         }
     }
 }
