@@ -76,6 +76,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyInformationProvider.cs" />
     <Compile Include="AssemblyReferenceInfo.cs" />
     <Compile Include="AssemblySource.cs" />
     <Compile Include="DependencyAnalyzer.cs" />

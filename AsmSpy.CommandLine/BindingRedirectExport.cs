@@ -26,14 +26,14 @@ namespace AsmSpy.CommandLine
         {
             try
             {
-                var document = Generate(_result, false);
+                var document = Generate(_result, skipSystem: false);
                 using (var writer = XmlWriter.Create(_exportFileName, new XmlWriterSettings{Indent = true}))
                 {
                     document.WriteTo(writer);
                 }
                 _logger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Exported to file {0}", _exportFileName));
             }
-            catch (System.UnauthorizedAccessException uae)
+            catch (UnauthorizedAccessException uae)
             {
                 _logger.LogError(string.Format(CultureInfo.InvariantCulture, "Could not write file {0} due to error {1}", _exportFileName, uae.Message));
             }
@@ -43,7 +43,7 @@ namespace AsmSpy.CommandLine
             }
         }
 
-        public static XmlDocument Generate(IDependencyAnalyzerResult result, bool skipSystem = false)
+        public static XmlDocument Generate(IDependencyAnalyzerResult result, bool skipSystem)
         {
             var document = new XmlDocument();
             document.LoadXml(@"
@@ -51,12 +51,11 @@ namespace AsmSpy.CommandLine
                     <assemblyBinding xmlns=""urn: schemas - microsoft - com:asm.v1"">
                     </assemblyBinding>
                 </runtime>");
-            var assemblyGroups = result.Assemblies.Values.GroupBy(x => x.AssemblyName.Name);
-            foreach (var assemblyGroup in assemblyGroups.OrderBy(i => i.Key))
+            var assemblyGroups = result.Assemblies.Values.GroupBy(x => x.AssemblyName);
+
+            foreach (var assemblyGroup in assemblyGroups.OrderBy(i => i.Key.Name))
             {
-                if (skipSystem &&
-                    (assemblyGroup.Key.ToUpperInvariant().StartsWith("SYSTEM", StringComparison.OrdinalIgnoreCase) ||
-                     assemblyGroup.Key.ToUpperInvariant().StartsWith("MSCORLIB", StringComparison.OrdinalIgnoreCase)))
+                if (skipSystem && AssemblyInformationProvider.IsSystemAssembly(assemblyGroup.Key))
                 {
                     continue;
                 }
@@ -96,7 +95,7 @@ namespace AsmSpy.CommandLine
                     assemblyIdentity.SetAttribute("publicKeyToken", publicKeyToken);
                 }
                 var cultureName = assemblyToUse.CultureName;
-                assemblyIdentity.SetAttribute("culture", cultureName == "" ? "neutral" : cultureName);
+                assemblyIdentity.SetAttribute("culture", string.IsNullOrEmpty(cultureName) ? "neutral" : cultureName);
                 depedententAssembly.AppendChild(assemblyIdentity);
                 var bindingRedirect = document.CreateElement("bindingRedirect");
                 bindingRedirect.SetAttribute("oldVersion", $"{lowestAssemblyVersion}-{highestAssemblyVersion}");

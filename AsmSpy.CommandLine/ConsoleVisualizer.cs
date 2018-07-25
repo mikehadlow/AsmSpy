@@ -22,6 +22,7 @@ namespace AsmSpy.CommandLine
         #region Properties
 
         public bool OnlyConflicts { get; set; }
+
         public bool SkipSystem { get; set; }
 
         public string ReferencedStartsWith { get; set; }
@@ -52,16 +53,16 @@ namespace AsmSpy.CommandLine
                 Console.WriteLine(AsmSpy_CommandLine.Detailing_only_conflicting_assembly_references);
             }
 
-            var assemblyGroups = _analyzerResult.Assemblies.Values.GroupBy(x => x.AssemblyName.Name);
+            var assemblyGroups = _analyzerResult.Assemblies.Values.GroupBy(x => x.AssemblyName);
 
-            foreach (var assemblyGroup in assemblyGroups.OrderBy(i => i.Key))
+            foreach (var assemblyGroup in assemblyGroups.OrderBy(i => i.Key.Name))
             {
-                if (SkipSystem && (assemblyGroup.Key.ToUpperInvariant().StartsWith("SYSTEM", StringComparison.OrdinalIgnoreCase) || assemblyGroup.Key.ToUpperInvariant().StartsWith("MSCORLIB", StringComparison.OrdinalIgnoreCase)))
+                if (SkipSystem && AssemblyInformationProvider.IsSystemAssembly(assemblyGroup.Key))
                 {
                     continue;
                 }
 
-                var assemblyInfos = assemblyGroup.OrderBy(x => x.AssemblyName.ToString()).ToList();
+                var assemblyInfos = assemblyGroup.OrderBy(x => x.AssemblyName.Name).ToList();
                 if (OnlyConflicts && assemblyInfos.Count <= 1)
                 {
                     if (assemblyInfos.Count == 1 && assemblyInfos[0].AssemblySource == AssemblySource.Local)

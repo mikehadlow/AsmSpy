@@ -10,6 +10,7 @@ namespace AsmSpy.Core
         AssemblyName AssemblyName { get; }
         ICollection<IAssemblyReferenceInfo> ReferencedBy { get; }
         ICollection<IAssemblyReferenceInfo> References { get; }
+        bool IsSystem { get; }
         void AddReference(IAssemblyReferenceInfo info);
         void AddReferencedBy(IAssemblyReferenceInfo info);
     }
