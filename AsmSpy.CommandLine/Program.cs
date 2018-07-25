@@ -6,14 +6,13 @@ using System.Linq;
 using AsmSpy.Core;
 using Microsoft.Extensions.CommandLineUtils;
 
-
 namespace AsmSpy.CommandLine
 {
     public static class Program
     {
         public static void Main(string[] args)
         {
-            var commandLineApplication = new CommandLineApplication(false);
+            var commandLineApplication = new CommandLineApplication(throwOnUnexpectedArg: true);
             var directoryOrFile = commandLineApplication.Argument("directoryOrFile", "The directory to search for assemblies or file path to a single assembly");
             var dgmlExport = commandLineApplication.Option("-dg|--dgml <filename>", "Export to a dgml file", CommandOptionType.SingleValue);
             var nonsystem = commandLineApplication.Option("-n|--nonsystem", "Ignore 'System' assemblies", CommandOptionType.NoValue);
