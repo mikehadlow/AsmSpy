@@ -40,9 +40,8 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Extensions.CommandLineUtils, Version=1.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.CommandLineUtils.1.1.0\lib\net451\Microsoft.Extensions.CommandLineUtils.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.Extensions.CommandLineUtils">
+      <HintPath>..\..\..\Users\george\Documents\Visual Studio 2017\Projects\Miyabi DMS\TestingLibrary\AsmSpy\packages\Microsoft.Extensions.CommandLineUtils.1.1.0\lib\net451\Microsoft.Extensions.CommandLineUtils.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
