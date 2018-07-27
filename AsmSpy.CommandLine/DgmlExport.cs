@@ -1,13 +1,22 @@
-﻿using System.Collections.Generic;
-using System.Globalization;
+﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
-using System.Text;
 using AsmSpy.Core;
+using static System.FormattableString;
 
 namespace AsmSpy.CommandLine
 {
     public class DgmlExport : IDependencyVisualizer
     {
+        private static readonly IReadOnlyDictionary<AssemblySource, Color> AssemblySourceColors = new Dictionary<AssemblySource, Color>()
+        {
+            { AssemblySource.NotFound, Color.Red },
+            { AssemblySource.Local, Color.Green },
+            { AssemblySource.GlobalAssemblyCache, Color.Yellow },
+            { AssemblySource.Unknown, Color.Gray },
+        };
+
         private readonly IDependencyAnalyzerResult _result;
         private readonly string _exportFileName;
         private readonly ILogger _logger;
@@ -27,63 +36,87 @@ namespace AsmSpy.CommandLine
 
         public void Visualize()
         {
-            var nodes = new StringBuilder();
-            foreach (var assemblyReference in _result.Assemblies.Values)
-            {
-                if (SkipSystem && assemblyReference.IsSystem)
-                    continue;
-
-                nodes.AppendFormat(CultureInfo.InvariantCulture, "<Node Id=\"{0}\" Label=\"{1}\" Category=\"Assembly\" />\n",
-                    assemblyReference.AssemblyName.FullName, assemblyReference.AssemblyName.Name);
-            }
-
-            var links = new StringBuilder();
-            foreach (var assemblyReference in _result.Assemblies.Values)
-            {
-                if (SkipSystem && assemblyReference.IsSystem)
-                    continue;
-
-                foreach (var referenceTo in assemblyReference.References)
-                {
-                    if (SkipSystem && referenceTo.IsSystem)
-                        continue;
-
-                    links.AppendFormat(CultureInfo.InvariantCulture, "<Link Source=\"{0}\" Target=\"{1}\" Category=\"Reference\" />\n",
-                        assemblyReference.AssemblyName.FullName, referenceTo.AssemblyName.FullName);
-                }
-            }
-
-            var dgml = new StringBuilder();
-            dgml.Append("<?xml version=\"1.0\" encoding=\"utf - 8\"?>\n");
-            dgml.Append("<DirectedGraph Title=\"AsmSpy:References\" xmlns=\"http://schemas.microsoft.com/vs/2009/dgml\">\n");
-
-            dgml.Append("<Nodes>\n");
-            dgml.Append(nodes);
-            
-            dgml.Append("</Nodes>\n");
-
-            dgml.Append("<Links>\n");
-            dgml.Append(links);
-            dgml.Append("</Links>\n");
-
-            dgml.Append("<Categories>\n");
-            dgml.Append("<Category Id=\"Assembly\"/>\n");
-            dgml.Append("<Category Id=\"Reference\"/>\n");
-            dgml.Append("</Categories>\n");
-
-            dgml.Append("</DirectedGraph>\n");
+            Stream fileStream = null;
             try
             {
-                File.WriteAllText(_exportFileName, dgml.ToString());
-                _logger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Exported to file {0}", _exportFileName));
+                fileStream = File.OpenWrite(_exportFileName);
+                using (var dgml = new StreamWriter(fileStream))
+                {
+                    fileStream = null; // now the StreamWriter owns the stream (fix warning CA2202)
+
+                    dgml.WriteLine(@"<?xml version=""1.0"" encoding=""utf-8""?>");
+                    dgml.WriteLine(@"<DirectedGraph Title=""AsmSpy:References"" xmlns=""http://schemas.microsoft.com/vs/2009/dgml"">");
+
+                    dgml.WriteLine(@"<Nodes>");
+                    foreach (var assemblyReference in _result.Assemblies.Values)
+                    {
+                        if (SkipSystem && assemblyReference.IsSystem)
+                            continue;
+
+                        dgml.WriteLine(Invariant($@"<Node Id=""{assemblyReference.AssemblyName.FullName}"" Label=""{assemblyReference.AssemblyName.Name}"" Category=""Assembly"">"));
+                        dgml.WriteLine(Invariant($@"<Category Ref=""{assemblyReference.AssemblySource}"" />"));
+                        dgml.WriteLine(@"</Node>");
+                    }
+
+                    dgml.WriteLine(@"</Nodes>");
+
+                    dgml.WriteLine(@"<Links>");
+
+                    foreach (var assemblyReference in _result.Assemblies.Values)
+                    {
+                        if (SkipSystem && assemblyReference.IsSystem)
+                            continue;
+
+                        foreach (var referenceTo in assemblyReference.References)
+                        {
+                            if (SkipSystem && referenceTo.IsSystem)
+                                continue;
+
+                            dgml.WriteLine(Invariant($@"<Link Source=""{assemblyReference.AssemblyName.FullName}"" Target=""{referenceTo.AssemblyName.FullName}"" Category=""Reference"" />"));
+                        }
+                    }
+
+                    dgml.WriteLine(@"</Links>");
+
+                    dgml.WriteLine(@"<Categories>");
+                    dgml.WriteLine(@"<Category Id=""Assembly""/>");
+                    dgml.WriteLine(@"<Category Id=""Reference""/>");
+
+                    foreach (var kvp in AssemblySourceColors)
+                    {
+                        dgml.WriteLine(Invariant($@"<Category Id=""{kvp.Key}"" Label=""{kvp.Key}"" Background=""{ColorTranslator.ToHtml(kvp.Value)}"" IsTag=""True"" />"));
+                    }
+
+                    dgml.WriteLine(@"</Categories>");
+
+                    dgml.WriteLine(@"<Styles>");
+
+                    foreach (var kvp in AssemblySourceColors)
+                    {
+                        dgml.WriteLine(Invariant($@"<Style TargetType=""Node"" GroupLabel=""AssemblySource: {kvp.Key}"" ValueLabel=""Has category"">"));
+                        dgml.WriteLine(Invariant($@"<Condition Expression=""HasCategory('{kvp.Key}')"" />"));
+                        dgml.WriteLine(Invariant($@"<Setter Property=""Background"" Value=""{ColorTranslator.ToHtml(kvp.Value)}"" />"));
+                        dgml.WriteLine(@"</Style>");
+                    }
+
+                    dgml.WriteLine(@"</Styles>");
+
+                    dgml.WriteLine(@"</DirectedGraph>");
+                }
+
+                _logger.LogMessage(Invariant($"Exported to file {_exportFileName}"));
             }
-            catch (System.UnauthorizedAccessException uae)
+            catch (UnauthorizedAccessException uae)
             {
-                _logger.LogError(string.Format(CultureInfo.InvariantCulture, "Could not write file {0} due to error {1}", _exportFileName, uae.Message));
+                _logger.LogError(Invariant($"Could not write file {_exportFileName} due to error {uae.Message}"));
             }
             catch (DirectoryNotFoundException dnfe)
             {
-                _logger.LogError(string.Format(CultureInfo.InvariantCulture, "Could not write file {0} due to error {1}", _exportFileName, dnfe.Message));            
+                _logger.LogError(Invariant($"Could not write file {_exportFileName} due to error {dnfe.Message}"));
+            }
+            finally
+            {
+                fileStream?.Dispose();
             }
         }
     }
