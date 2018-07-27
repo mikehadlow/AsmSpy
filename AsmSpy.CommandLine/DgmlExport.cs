@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using AsmSpy.Core;
@@ -18,12 +19,20 @@ namespace AsmSpy.CommandLine
             _logger = logger;
         }
 
+        #region Properties
+
+        public bool SkipSystem { get; set; }
+
+        #endregion
+
         public void Visualize()
         {
             var nodes = new StringBuilder();
-
             foreach (var assemblyReference in _result.Assemblies.Values)
             {
+                if (SkipSystem && assemblyReference.IsSystem)
+                    continue;
+
                 nodes.AppendFormat(CultureInfo.InvariantCulture, "<Node Id=\"{0}\" Label=\"{1}\" Category=\"Assembly\" />\n",
                     assemblyReference.AssemblyName.FullName, assemblyReference.AssemblyName.Name);
             }
@@ -31,8 +40,14 @@ namespace AsmSpy.CommandLine
             var links = new StringBuilder();
             foreach (var assemblyReference in _result.Assemblies.Values)
             {
+                if (SkipSystem && assemblyReference.IsSystem)
+                    continue;
+
                 foreach (var referenceTo in assemblyReference.References)
                 {
+                    if (SkipSystem && referenceTo.IsSystem)
+                        continue;
+
                     links.AppendFormat(CultureInfo.InvariantCulture, "<Link Source=\"{0}\" Target=\"{1}\" Category=\"Reference\" />\n",
                         assemblyReference.AssemblyName.FullName, referenceTo.AssemblyName.FullName);
                 }

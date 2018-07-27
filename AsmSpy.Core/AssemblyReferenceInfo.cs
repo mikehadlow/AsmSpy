@@ -20,6 +20,7 @@ namespace AsmSpy.Core
         public virtual AssemblyName AssemblyName { get; }
         public virtual ICollection<IAssemblyReferenceInfo> ReferencedBy => _referencedBy.ToArray();
         public virtual ICollection<IAssemblyReferenceInfo> References => _references.ToArray();
+        public bool IsSystem => AssemblyInformationProvider.IsSystemAssembly(AssemblyName);
 
         #endregion
 
@@ -61,12 +62,12 @@ namespace AsmSpy.Core
 
         public override bool Equals(object obj)
         {
-            var info = obj as IAssemblyReferenceInfo;
-            if (info == null)
+            if (obj is IAssemblyReferenceInfo info)
             {
-                return false;
+                return info.AssemblyName.FullName == AssemblyName.FullName;
             }
-            return info.AssemblyName.FullName == AssemblyName.FullName;
+
+            return false;
         }
 
         #endregion

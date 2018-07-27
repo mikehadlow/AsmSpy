@@ -76,13 +76,13 @@ namespace AsmSpy.CommandLine
 
                 if (dgmlExport.HasValue())
                 {
-
-                    IDependencyVisualizer export = new DgmlExport(result, string.IsNullOrWhiteSpace(dgmlExport.Value()) ? Path.Combine(directoryInfo.FullName, "references.dgml") : dgmlExport.Value(), consoleLogger);
+                    IDependencyVisualizer export = new DgmlExport(result, string.IsNullOrWhiteSpace(dgmlExport.Value()) ? Path.Combine(directoryInfo.FullName, "references.dgml") : dgmlExport.Value(), consoleLogger) { SkipSystem = skipSystem };
                     export.Visualize();
                 }
 
                 if (bindingRedirect.HasValue())
                 {
+                    // binding redirect export explicitly doesn't respect SkipSystem
                     IDependencyVisualizer bindingRedirects = new BindingRedirectExport(result, string.IsNullOrWhiteSpace(dgmlExport.Value()) ? Path.Combine(directoryInfo.FullName, "bindingRedirects.xml") : dgmlExport.Value(), consoleLogger);
                     bindingRedirects.Visualize();
                 }
