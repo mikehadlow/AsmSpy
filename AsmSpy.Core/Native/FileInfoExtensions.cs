@@ -16,7 +16,7 @@ namespace AsmSpy.Core.Native
             }
 
             var data = new byte[PageSize];
-            using (var fs = File.Open(fileInfo.FullName, FileMode.Open, FileAccess.Read))
+            using (var fs = File.Open(fileInfo.FullName, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 var iRead = fs.Read(data, 0, PageSize);
                 if (iRead != PageSize)
@@ -48,6 +48,7 @@ namespace AsmSpy.Core.Native
                     }
                 }
             }
+
             return true;
         }
 
