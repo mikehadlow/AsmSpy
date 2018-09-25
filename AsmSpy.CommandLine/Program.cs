@@ -1,10 +1,12 @@
-﻿using System;
+﻿using AsmSpy.Core;
+
+using Microsoft.Extensions.CommandLineUtils;
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using AsmSpy.Core;
-using Microsoft.Extensions.CommandLineUtils;
 
 namespace AsmSpy.CommandLine
 {
@@ -22,6 +24,7 @@ namespace AsmSpy.CommandLine
             var bindingRedirect = commandLineApplication.Option("-b|--bindingredirect", "Create binding-redirects", CommandOptionType.NoValue);
             var referencedStartsWith = commandLineApplication.Option("-rsw|--referencedstartswith", "Referenced Assembly should start with <string>. Will only analyze assemblies if their referenced assemblies starts with the given value.", CommandOptionType.SingleValue);
             var includeSubDirectories = commandLineApplication.Option("-i|--includesub", "Include subdirectories in search", CommandOptionType.NoValue);
+            var configurationFile = commandLineApplication.Option("-c|--configurationFile", "Use the binding redirects of the given configuration file (Web.config or App.config)", CommandOptionType.SingleValue);
 
             commandLineApplication.HelpOption("-? | -h | --help");
             commandLineApplication.OnExecute(() =>
@@ -34,6 +37,13 @@ namespace AsmSpy.CommandLine
                 if (!File.Exists(directoryOrFilePath) && !Directory.Exists(directoryOrFilePath))
                 {
                     consoleLogger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Directory or file: '{0}' does not exist.", directoryOrFilePath));
+                    return -1;
+                }
+
+                var configurationFilePath = configurationFile.Value();
+                if (!string.IsNullOrEmpty(configurationFilePath) && !File.Exists(configurationFilePath))
+                {
+                    consoleLogger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Directory or file: '{0}' does not exist.", configurationFilePath));
                     return -1;
                 }
 
@@ -63,8 +73,23 @@ namespace AsmSpy.CommandLine
                     fileList = directoryInfo.GetFiles("*.dll", searchPattern).Concat(directoryInfo.GetFiles("*.exe", searchPattern)).ToList();
                     consoleLogger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Check assemblies in: {0}", directoryInfo));
                 }
+
+                AppDomain appDomainWithBindingRedirects = null;
+                try
+                {
+                    var domaininfo = new AppDomainSetup
+                    {
+                        ConfigurationFile = configurationFilePath
+                    };
+                    appDomainWithBindingRedirects = AppDomain.CreateDomain("AppDomainWithBindingRedirects", null, domaininfo);
+                }
+                catch (Exception ex)
+                {
+                    consoleLogger.LogError($"Failed creating AppDomain from configuration file with message {ex.Message}");
+                    return -1;
+                }
                 
-                IDependencyAnalyzer analyzer = new DependencyAnalyzer(fileList);
+                IDependencyAnalyzer analyzer = new DependencyAnalyzer(fileList, appDomainWithBindingRedirects);
 
                 var result = analyzer.Analyze(consoleLogger);
 

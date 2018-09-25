@@ -1,10 +1,11 @@
-﻿using System;
+﻿using AsmSpy.Core.Native;
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using AsmSpy.Core.Native;
 
 namespace AsmSpy.Core
 {
@@ -14,25 +15,30 @@ namespace AsmSpy.Core
 
         public virtual IEnumerable<FileInfo> Files { get; }
 
+        protected virtual AppDomain AppDomainWithBindingRedirects { get; }
+
         #endregion
 
         #region Analyze Support
 
-        public DependencyAnalyzer(IEnumerable<FileInfo> files)
+        public DependencyAnalyzer(IEnumerable<FileInfo> files, AppDomain appDomainWithBindingRedirects = null)
         {
             Files = files;
+            AppDomainWithBindingRedirects = appDomainWithBindingRedirects;
         }
 
-        private static AssemblyReferenceInfo GetAssemblyReferenceInfo(IDictionary<string, AssemblyReferenceInfo> assemblies, AssemblyName assemblyName)
+        private AssemblyReferenceInfo GetAssemblyReferenceInfo(IDictionary<string, AssemblyReferenceInfo> assemblies, AssemblyName assemblyName)
         {
+            var assemblyFullName = AppDomainWithBindingRedirects != null ? AppDomainWithBindingRedirects.ApplyPolicy(assemblyName.FullName) : assemblyName.FullName;
+
             AssemblyReferenceInfo assemblyReferenceInfo;
-            if (assemblies.TryGetValue(assemblyName.FullName, out assemblyReferenceInfo))
+            if (assemblies.TryGetValue(assemblyFullName, out assemblyReferenceInfo))
             {
                 return assemblyReferenceInfo;
             }
 
-            assemblyReferenceInfo = new AssemblyReferenceInfo(assemblyName);
-            assemblies.Add(assemblyName.FullName, assemblyReferenceInfo);
+            assemblyReferenceInfo = new AssemblyReferenceInfo(assemblyName, new AssemblyName(assemblyFullName));
+            assemblies.Add(assemblyFullName, assemblyReferenceInfo);
             return assemblyReferenceInfo;
         }
 
