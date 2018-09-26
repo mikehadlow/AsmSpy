@@ -21,7 +21,6 @@ namespace AsmSpy.Core
 
         public ICollection<FileInfo> AnalyzedFiles { get; }
         public IDictionary<string, AssemblyReferenceInfo> Assemblies { get; }
-
-        public bool HasMissingAssemblies => Assemblies.Any(x => x.Value.AssemblySource == AssemblySource.NotFound);
+        public IEnumerable<AssemblyReferenceInfo> MissingAssemblies => Assemblies.Where(x => x.Value.AssemblySource == AssemblySource.NotFound).Select(x => x.Value);
     }
 }

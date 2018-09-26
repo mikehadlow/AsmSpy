@@ -113,7 +113,7 @@ namespace AsmSpy.CommandLine
                     bindingRedirects.Visualize();
                 }
 
-                if (failOnMissing.HasValue() && result.HasMissingAssemblies)
+                if (failOnMissing.HasValue() && result.MissingAssemblies.Any(x => !skipSystem || !x.IsSystem))
                 {
                     return -1;
                 }
