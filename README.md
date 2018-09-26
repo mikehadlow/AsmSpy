@@ -31,7 +31,8 @@ It will output a list of all conflicting assembly references. That is where diff
 | dgml | export dependency graph to a dgml file.<br> Supported formats:  -dg \<filename\>, --silent \<filename\> |
 | rsw | Will only analyze assemblies if their referenced assemblies starts with the given value.<br> Supported formats:  -rsw \<string\>, --referencedstartswith \<string\> |
 | i | include subdirectories in search.<br> Supported formats:  -i, --includesub |
-| c | use the binding redirects of the given configuration file (Web.config or App.config) <br> Supported formats: -c|--configurationFile |
+| c | use the binding redirects of the given configuration file (Web.config or App.config) <br> Supported formats: -c \<string>, --configurationFile \<string> |
+| f | whether to exit with an error code when AsmSpy detected Assemblies which could not be found <br> Supported formats. -f, --failOnMissing |
 
 ### Examples
 To see a list of all assemblies and all references, just add the 'all' flag:
