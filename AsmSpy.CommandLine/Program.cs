@@ -12,7 +12,7 @@ namespace AsmSpy.CommandLine
 {
     public static class Program
     {
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
             var commandLineApplication = new CommandLineApplication(throwOnUnexpectedArg: true);
             var directoryOrFile = commandLineApplication.Argument("directoryOrFile", "The directory to search for assemblies or file path to a single assembly");
@@ -25,6 +25,7 @@ namespace AsmSpy.CommandLine
             var referencedStartsWith = commandLineApplication.Option("-rsw|--referencedstartswith", "Referenced Assembly should start with <string>. Will only analyze assemblies if their referenced assemblies starts with the given value.", CommandOptionType.SingleValue);
             var includeSubDirectories = commandLineApplication.Option("-i|--includesub", "Include subdirectories in search", CommandOptionType.NoValue);
             var configurationFile = commandLineApplication.Option("-c|--configurationFile", "Use the binding redirects of the given configuration file (Web.config or App.config)", CommandOptionType.SingleValue);
+            var failOnMissing = commandLineApplication.Option("-f|--failOnMissing", "Whether to exit with an error code when AsmSpy detected Assemblies which could not be found", CommandOptionType.NoValue);
 
             commandLineApplication.HelpOption("-? | -h | --help");
             commandLineApplication.OnExecute(() =>
@@ -112,6 +113,10 @@ namespace AsmSpy.CommandLine
                     bindingRedirects.Visualize();
                 }
 
+                if (failOnMissing.HasValue() && result.HasMissingAssemblies)
+                {
+                    return -1;
+                }
                 return 0;
             });
             try
@@ -119,16 +124,16 @@ namespace AsmSpy.CommandLine
                 if (args == null || args.Length == 0)
                 {
                     commandLineApplication.ShowHelp();
+                    return 0;
                 }
-                else
-                {
-                    commandLineApplication.Execute(args);
-                }
+
+                return commandLineApplication.Execute(args);
             }
             catch (CommandParsingException cpe)
             {
                 Console.WriteLine(cpe.Message);
                 commandLineApplication.ShowHelp();
+                return 0;
             }
         }
     }

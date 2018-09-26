@@ -7,5 +7,6 @@ namespace AsmSpy.Core
     {
         ICollection<FileInfo> AnalyzedFiles { get; }
         IDictionary<string, AssemblyReferenceInfo> Assemblies { get; }
+        bool HasMissingAssemblies { get; }
     }
 }
