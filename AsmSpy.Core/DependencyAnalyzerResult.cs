@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace AsmSpy.Core
 {
@@ -20,5 +21,7 @@ namespace AsmSpy.Core
 
         public ICollection<FileInfo> AnalyzedFiles { get; }
         public IDictionary<string, AssemblyReferenceInfo> Assemblies { get; }
+
+        public bool HasMissingAssemblies => Assemblies.Any(x => x.Value.AssemblySource == AssemblySource.NotFound);
     }
 }

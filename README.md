@@ -5,7 +5,7 @@ AsmSpy
 
 A simple command line tool to view assembly references.
 
-## Install 
+## Install
 
 Install [from Chocolatey package](https://chocolatey.org/packages/asmspy):
 
@@ -31,6 +31,8 @@ It will output a list of all conflicting assembly references. That is where diff
 | dgml | export dependency graph to a dgml file.<br> Supported formats:  -dg \<filename\>, --silent \<filename\> |
 | rsw | Will only analyze assemblies if their referenced assemblies starts with the given value.<br> Supported formats:  -rsw \<string\>, --referencedstartswith \<string\> |
 | i | include subdirectories in search.<br> Supported formats:  -i, --includesub |
+| c | use the binding redirects of the given configuration file (Web.config or App.config) <br> Supported formats: -c \<string>, --configurationFile \<string> |
+| f | whether to exit with an error code when AsmSpy detected Assemblies which could not be found <br> Supported formats. -f, --failOnMissing |
 
 ### Examples
 To see a list of all assemblies and all references, just add the 'all' flag:
@@ -64,7 +66,7 @@ The output looks something like this:
 		3.5.0.0 by Microsoft.Web.Mvc
 
 
-You can see that System.Web.Mvc is referenced by 7 assemblies in my bin folder. Some reference 
+You can see that System.Web.Mvc is referenced by 7 assemblies in my bin folder. Some reference
 version 2.0.0.0 and some version 3.0.0.0. I can now resolve any conflicts.
 
 Color coding is used to more easily distinguish any problems.

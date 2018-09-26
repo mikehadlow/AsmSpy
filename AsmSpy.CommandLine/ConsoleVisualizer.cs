@@ -1,8 +1,9 @@
-﻿using System;
+﻿using AsmSpy.Core;
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using AsmSpy.Core;
 
 namespace AsmSpy.CommandLine
 {
@@ -10,6 +11,7 @@ namespace AsmSpy.CommandLine
     {
         private const ConsoleColor AssemblyNotFoundColor = ConsoleColor.Red;
         private const ConsoleColor AssemblyLocalColor = ConsoleColor.Green;
+        private const ConsoleColor AssemblyLocalRedirectedColor = ConsoleColor.DarkGreen;
         private const ConsoleColor AssemblyGlobalAssemblyCacheColor = ConsoleColor.Yellow;
         private const ConsoleColor AssemblyUnknownColor = ConsoleColor.Magenta;
 
@@ -53,7 +55,7 @@ namespace AsmSpy.CommandLine
                 Console.WriteLine(AsmSpy_CommandLine.Detailing_only_conflicting_assembly_references);
             }
 
-            var assemblyGroups = _analyzerResult.Assemblies.Values.GroupBy(x => x.AssemblyName);
+            var assemblyGroups = _analyzerResult.Assemblies.Values.GroupBy(x => x.RedirectedAssemblyName);
 
             foreach (var assemblyGroup in assemblyGroups.OrderBy(i => i.Key.Name))
             {
@@ -118,7 +120,14 @@ namespace AsmSpy.CommandLine
             }
             else
             {
-                mainNameColor = AssemblyLocalColor;
+                if (assemblyReferenceInfoList.All(x => x.AssemblyName.FullName == x.RedirectedAssemblyName.FullName))
+                {
+                    mainNameColor = AssemblyLocalColor;
+                }
+                else
+                {
+                    mainNameColor = AssemblyLocalRedirectedColor;
+                }
             }
             return mainNameColor;
         }

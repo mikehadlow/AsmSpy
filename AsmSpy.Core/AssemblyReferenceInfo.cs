@@ -6,6 +6,7 @@ namespace AsmSpy.Core
 {
     public class AssemblyReferenceInfo : IAssemblyReferenceInfo
     {
+
         #region Fields
 
         private readonly HashSet<IAssemblyReferenceInfo> _references = new HashSet<IAssemblyReferenceInfo>();
@@ -18,6 +19,7 @@ namespace AsmSpy.Core
         public virtual Assembly ReflectionOnlyAssembly { get; set; }
         public virtual AssemblySource AssemblySource { get; set; }
         public virtual AssemblyName AssemblyName { get; }
+        public virtual AssemblyName RedirectedAssemblyName { get; }
         public virtual ICollection<IAssemblyReferenceInfo> ReferencedBy => _referencedBy.ToArray();
         public virtual ICollection<IAssemblyReferenceInfo> References => _references.ToArray();
         public bool IsSystem => AssemblyInformationProvider.IsSystemAssembly(AssemblyName);
@@ -26,9 +28,10 @@ namespace AsmSpy.Core
 
         #region Constructor
 
-        public AssemblyReferenceInfo(AssemblyName assemblyName)
+        public AssemblyReferenceInfo(AssemblyName assemblyName, AssemblyName redirectedAssemblyName)
         {
             AssemblyName = assemblyName;
+            RedirectedAssemblyName = redirectedAssemblyName;
         }
 
         #endregion
