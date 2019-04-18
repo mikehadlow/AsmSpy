@@ -77,3 +77,4 @@ Color coding is used to more easily distinguish any problems.
 ### Configure AsmSpy as an external tool in Visual Studio
 
 [Blog post here](http://mikehadlow.blogspot.co.uk/2018/01/configure-asmspy-as-external-tool-in.html)
+ 
