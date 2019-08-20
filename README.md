@@ -28,7 +28,8 @@ It will output a list of all conflicting assembly references. That is where diff
 | nonsystem | ignore system assemblies. <br> Supported formats:  -n, --nonsystem |
 | noconsole | do not show reference output on console.<br> Supported formats:  -nc, --noconsole |
 | silent | do not show any output, only warnings and errors will be shown.<br> Supported formats:  -s, --silent |
-| dgml | export dependency graph to a dgml file.<br> Supported formats:  -dg \<filename\>, --silent \<filename\> |
+| dgml | export dependency graph to a dgml file.<br> Supported formats:  -dg \<filename\> |
+| xml | Export dependency graph to a xml file.<br> Supported formats:  -x \<filename\> |
 | rsw | Will only analyze assemblies if their referenced assemblies starts with the given value.<br> Supported formats:  -rsw \<string\>, --referencedstartswith \<string\> |
 | i | include subdirectories in search.<br> Supported formats:  -i, --includesub |
 | c | use the binding redirects of the given configuration file (Web.config or App.config) <br> Supported formats: -c \<string>, --configurationFile \<string> |
