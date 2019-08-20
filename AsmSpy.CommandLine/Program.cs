@@ -26,6 +26,7 @@ namespace AsmSpy.CommandLine
             var includeSubDirectories = commandLineApplication.Option("-i|--includesub", "Include subdirectories in search", CommandOptionType.NoValue);
             var configurationFile = commandLineApplication.Option("-c|--configurationFile", "Use the binding redirects of the given configuration file (Web.config or App.config)", CommandOptionType.SingleValue);
             var failOnMissing = commandLineApplication.Option("-f|--failOnMissing", "Whether to exit with an error code when AsmSpy detected Assemblies which could not be found", CommandOptionType.NoValue);
+            var xml = commandLineApplication.Option("-x|--xml <filename>", "Export to a xml file", CommandOptionType.SingleValue);
 
             commandLineApplication.HelpOption("-? | -h | --help");
             commandLineApplication.OnExecute(() =>
@@ -89,7 +90,7 @@ namespace AsmSpy.CommandLine
                     consoleLogger.LogError($"Failed creating AppDomain from configuration file with message {ex.Message}");
                     return -1;
                 }
-                
+
                 IDependencyAnalyzer analyzer = new DependencyAnalyzer(fileList, appDomainWithBindingRedirects);
 
                 var result = analyzer.Analyze(consoleLogger);
@@ -103,6 +104,16 @@ namespace AsmSpy.CommandLine
                 if (dgmlExport.HasValue())
                 {
                     IDependencyVisualizer export = new DgmlExport(result, string.IsNullOrWhiteSpace(dgmlExport.Value()) ? Path.Combine(directoryInfo.FullName, "references.dgml") : dgmlExport.Value(), consoleLogger) { SkipSystem = skipSystem };
+                    export.Visualize();
+                }
+
+                if (xml.HasValue())
+                {
+                    var export = new XmlExport(result, string.IsNullOrWhiteSpace(xml.Value()) ? Path.Combine(directoryInfo.FullName, "references.xml") : xml.Value(), consoleLogger)
+                    {
+                        SkipSystem = skipSystem,
+                        ReferencedStartsWith = referencedStartsWith.HasValue() ? referencedStartsWith.Value() : string.Empty
+                    };
                     export.Visualize();
                 }
 
