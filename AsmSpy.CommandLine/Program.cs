@@ -112,6 +112,7 @@ namespace AsmSpy.CommandLine
                     var export = new XmlExport(result, string.IsNullOrWhiteSpace(xml.Value()) ? Path.Combine(directoryInfo.FullName, "references.xml") : xml.Value(), consoleLogger)
                     {
                         SkipSystem = skipSystem,
+                        OnlyConflicts = onlyConflicts,
                         ReferencedStartsWith = referencedStartsWith.HasValue() ? referencedStartsWith.Value() : string.Empty
                     };
                     export.Visualize();
@@ -144,7 +145,11 @@ namespace AsmSpy.CommandLine
             {
                 Console.WriteLine(cpe.Message);
                 commandLineApplication.ShowHelp();
-                return 0;
+                return -1;
+            }
+            catch (Exception)
+            {
+                return -1;
             }
         }
     }

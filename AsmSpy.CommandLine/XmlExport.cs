@@ -14,6 +14,7 @@ namespace AsmSpy.CommandLine
 
         public string ReferencedStartsWith { get; set; }
         public bool SkipSystem { get; set; }
+        public bool OnlyConflicts { get; set; }
 
         public XmlExport(IDependencyAnalyzerResult result, string fileName, ILogger logger)
         {
@@ -60,7 +61,7 @@ namespace AsmSpy.CommandLine
                 }
 
                 var assemblyInfos = assemblyGroup.OrderBy(x => x.AssemblyName.Name).ToList();
-                if (assemblyInfos.Count <= 1)
+                if (OnlyConflicts && assemblyInfos.Count <= 1)
                 {
                     if (assemblyInfos.Count == 1 && assemblyInfos[0].AssemblySource == AssemblySource.Local)
                     {
@@ -111,6 +112,7 @@ namespace AsmSpy.CommandLine
                                 using (writer.WriteElementScope("Referer"))
                                 {
                                     writer.WriteAttributeString("Name", referer.AssemblyName.Name);
+                                    writer.WriteAttributeString("Version", referer.AssemblyName.Version.ToString());
                                     writer.WriteAttributeString("FullName", referer.AssemblyName.FullName);
                                 }
                             }
