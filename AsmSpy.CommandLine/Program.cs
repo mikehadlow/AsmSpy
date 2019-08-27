@@ -1,4 +1,4 @@
-﻿using AsmSpy.Core;
+using AsmSpy.Core;
 
 using Microsoft.Extensions.CommandLineUtils;
 
@@ -91,13 +91,17 @@ namespace AsmSpy.CommandLine
                     return -1;
                 }
 
-                IDependencyAnalyzer analyzer = new DependencyAnalyzer(fileList, appDomainWithBindingRedirects);
+                IDependencyAnalyzer analyzer = new DependencyAnalyzer(fileList, appDomainWithBindingRedirects)
+                {
+                    SkipSystem = skipSystem,
+                    ReferencedStartsWith = referencedStartsWith.HasValue() ? referencedStartsWith.Value() : string.Empty
+                };
 
                 var result = analyzer.Analyze(consoleLogger);
 
                 if (!noconsole.HasValue())
                 {
-                    IDependencyVisualizer visualizer = new ConsoleVisualizer(result) { SkipSystem = skipSystem, OnlyConflicts = onlyConflicts, ReferencedStartsWith = referencedStartsWith.HasValue() ? referencedStartsWith.Value() : string.Empty };
+                    IDependencyVisualizer visualizer = new ConsoleVisualizer(result) { OnlyConflicts = onlyConflicts };
                     visualizer.Visualize();
                 }
 
@@ -125,7 +129,7 @@ namespace AsmSpy.CommandLine
                     bindingRedirects.Visualize();
                 }
 
-                if (failOnMissing.HasValue() && result.MissingAssemblies.Any(x => !skipSystem || !x.IsSystem))
+                if (failOnMissing.HasValue() && result.MissingAssemblies.Any())
                 {
                     return -1;
                 }

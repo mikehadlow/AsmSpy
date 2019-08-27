@@ -1,4 +1,4 @@
-﻿using AsmSpy.Core;
+using AsmSpy.Core;
 
 using System;
 using System.Collections.Generic;
@@ -24,10 +24,6 @@ namespace AsmSpy.CommandLine
         #region Properties
 
         public bool OnlyConflicts { get; set; }
-
-        public bool SkipSystem { get; set; }
-
-        public string ReferencedStartsWith { get; set; }
 
         #endregion
 
@@ -59,11 +55,6 @@ namespace AsmSpy.CommandLine
 
             foreach (var assemblyGroup in assemblyGroups.OrderBy(i => i.Key.Name))
             {
-                if (SkipSystem && AssemblyInformationProvider.IsSystemAssembly(assemblyGroup.Key))
-                {
-                    continue;
-                }
-
                 var assemblyInfos = assemblyGroup.OrderBy(x => x.AssemblyName.Name).ToList();
                 if (OnlyConflicts && assemblyInfos.Count <= 1)
                 {
@@ -76,16 +67,6 @@ namespace AsmSpy.CommandLine
                     {
                         continue;
                     }
-                }
-
-
-                var referenced =
-                    assemblyInfos.SelectMany(x => x.ReferencedBy).GroupBy(
-                            x =>
-                                x.AssemblyName.Name).Where(x => x.Key.ToUpperInvariant().StartsWith(ReferencedStartsWith.ToUpperInvariant(), StringComparison.OrdinalIgnoreCase));
-                if (!string.IsNullOrEmpty(ReferencedStartsWith) && !referenced.Any())
-                {
-                    continue;
                 }
 
                 Console.ForegroundColor = ConsoleColor.White;
@@ -170,11 +151,6 @@ namespace AsmSpy.CommandLine
 
             foreach (var referer in assemblyReferenceInfo.ReferencedBy.OrderBy(x => x.AssemblyName.ToString()))
             {
-                if (!string.IsNullOrEmpty(ReferencedStartsWith) && !referer.AssemblyName.Name.ToUpperInvariant().StartsWith(ReferencedStartsWith.ToUpperInvariant(), StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
                 Console.ForegroundColor = statusColor;
                 Console.Write(AsmSpy_CommandLine.ConsoleVisualizer_VisualizeAssemblyReferenceInfo______0_, assemblyReferenceInfo.AssemblyName.Version);
 

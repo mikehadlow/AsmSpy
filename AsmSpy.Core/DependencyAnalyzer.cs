@@ -1,4 +1,4 @@
-﻿using AsmSpy.Core.Native;
+using AsmSpy.Core.Native;
 
 using System;
 using System.Collections.Generic;
@@ -17,6 +17,10 @@ namespace AsmSpy.Core
 
         protected virtual AppDomain AppDomainWithBindingRedirects { get; }
 
+        public bool SkipSystem { get; set; }
+
+        public string ReferencedStartsWith { get; set; }
+
         #endregion
 
         #region Analyze Support
@@ -29,6 +33,16 @@ namespace AsmSpy.Core
 
         private AssemblyReferenceInfo GetAssemblyReferenceInfo(IDictionary<string, AssemblyReferenceInfo> assemblies, AssemblyName assemblyName)
         {
+            if (SkipSystem && AssemblyInformationProvider.IsSystemAssembly(assemblyName))
+            {
+                return null;
+            }
+
+            if (!string.IsNullOrEmpty(ReferencedStartsWith) && !assemblyName.FullName.StartsWith(ReferencedStartsWith, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
             var assemblyFullName = AppDomainWithBindingRedirects != null ? AppDomainWithBindingRedirects.ApplyPolicy(assemblyName.FullName) : assemblyName.FullName;
 
             AssemblyReferenceInfo assemblyReferenceInfo;
@@ -74,12 +88,23 @@ namespace AsmSpy.Core
                     logger.LogWarning(string.Format(CultureInfo.InvariantCulture, "Failed to load assembly '{0}': {1}", fileInfo.FullName, ex.Message));
                     continue;
                 }
+
                 var assemblyReferenceInfo = GetAssemblyReferenceInfo(result.Assemblies, assembly.GetName());
+                if (assemblyReferenceInfo == null)
+                {
+                    continue;
+                }
+
                 assemblyReferenceInfo.ReflectionOnlyAssembly = assembly;
                 assemblyReferenceInfo.AssemblySource = AssemblySource.Local;
                 foreach (var referencedAssembly in assembly.GetReferencedAssemblies())
                 {
                     var referencedAssemblyReferenceInfo = GetAssemblyReferenceInfo(result.Assemblies, referencedAssembly);
+                    if (referencedAssemblyReferenceInfo == null)
+                    {
+                        continue;
+                    }
+
                     assemblyReferenceInfo.AddReference(referencedAssemblyReferenceInfo);
                     referencedAssemblyReferenceInfo.AddReferencedBy(assemblyReferenceInfo);
                 }
