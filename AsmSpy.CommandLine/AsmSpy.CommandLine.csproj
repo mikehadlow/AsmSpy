@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\ILMerge.3.0.29\build\ILMerge.props" Condition="Exists('..\packages\ILMerge.3.0.29\build\ILMerge.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,10 +10,12 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AsmSpy.CommandLine</RootNamespace>
     <AssemblyName>AsmSpy.CommandLine</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -40,9 +43,8 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Extensions.CommandLineUtils, Version=1.1.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Extensions.CommandLineUtils.1.1.0\lib\net451\Microsoft.Extensions.CommandLineUtils.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="Microsoft.Extensions.CommandLineUtils, Version=1.1.1.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Extensions.CommandLineUtils.1.1.1\lib\net451\Microsoft.Extensions.CommandLineUtils.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -94,12 +96,12 @@
   <Target Name="MergeExecutable" Inputs="$(OutputPath)\NuGet.Core.dll;$(OutputPath)\NuGet.exe" Outputs="$(OutputPath)Merged\Legoland.exe" Condition=" '$(OS)' == 'Windows_NT'">
     <PropertyGroup>
       <NuGetRoot>$(NuGetPackagesPath)</NuGetRoot>
-      <ILMergeExe>$(NuGetRoot)\ILMerge.2.14.1208\Tools\ILMerge.exe</ILMergeExe>
+      <ILMergeExe>$(NuGetRoot)\ILMerge.3.0.29\tools\net452\ILMerge.exe</ILMergeExe>
       <ILMergeInternalizeIgnoreFile>$(MsBuildProjectDirectory)\ilmerge.internalize.ignore.txt</ILMergeInternalizeIgnoreFile>
       <ILMergeOutputFile>AsmSpy.exe</ILMergeOutputFile>
       <ILMergeOutputFilePath>$(OutputPath)$(ILMergeOutputFile)</ILMergeOutputFilePath>
-      <FrameworkPath>$(ProgramFiles)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2</FrameworkPath>
-      <FrameworkPath Condition="'$(MSBuildProgramFiles32)' != ''">$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.6.2</FrameworkPath>
+      <FrameworkPath>$(ProgramFiles)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2</FrameworkPath>
+      <FrameworkPath Condition="'$(MSBuildProgramFiles32)' != ''">$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2</FrameworkPath>
       <ILMergeCommandArgs>/targetplatform:"v4, $(FrameworkPath)" /internalize:"$(ILMergeInternalizeIgnoreFile)" /target:exe /out:"Merged\$(ILMergeOutputFile)" /log:"Merged\ilmerge.msbuild.log" /allowDup AsmSpy.CommandLine.exe AsmSpy.Core.dll Microsoft.Extensions.CommandLineUtils.dll</ILMergeCommandArgs>
     </PropertyGroup>
     <ItemGroup>
@@ -120,6 +122,12 @@
   </Target>
   <Target Name="AfterBuild">
     <CallTarget Targets="MergeExecutable" />
+  </Target>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\ILMerge.3.0.29\build\ILMerge.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\ILMerge.3.0.29\build\ILMerge.props'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

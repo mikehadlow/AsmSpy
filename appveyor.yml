@@ -1,5 +1,5 @@
 version: 1.3.{build}
-image: Visual Studio 2017
+image: Visual Studio 2019
 before_build:
   - nuget restore
 # enable patching of AssemblyInfo.* files

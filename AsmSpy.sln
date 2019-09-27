@@ -1,12 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29324.140
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsmSpy.Core", "AsmSpy.Core\AsmSpy.Core.csproj", "{5ACC768B-F9F7-4472-9AB9-2543E32FD1ED}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{8BC4A19E-A009-4660-8777-02502196180C}"
 	ProjectSection(SolutionItems) = preProject
+		appveyor.yml = appveyor.yml
+		CreateRelease.ps1 = CreateRelease.ps1
 		licence.txt = licence.txt
 		README.md = README.md
 	EndProjectSection
@@ -30,5 +32,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FD8DE56D-8C14-438F-86F0-26E27B4A0E44}
 	EndGlobalSection
 EndGlobal
