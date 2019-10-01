@@ -24,16 +24,17 @@ It will output a list of all conflicting assembly references. That is where diff
 ### Switches:
 | Switch | Description |
 | --- | --- |
-| all | list all assemblies and references.<br> Supported formats:  -a, --all |
-| nonsystem | ignore system assemblies. <br> Supported formats:  -n, --nonsystem |
-| noconsole | do not show reference output on console.<br> Supported formats:  -nc, --noconsole |
-| silent | do not show any output, only warnings and errors will be shown.<br> Supported formats:  -s, --silent |
-| dgml | export dependency graph to a dgml file.<br> Supported formats:  -dg \<filename\> |
+| all | List all assemblies and references.<br> Supported formats:  -a, --all |
+| nonsystem | Ignore system assemblies. <br> Supported formats:  -n, --nonsystem |
+| noconsole | Do not show reference output on console.<br> Supported formats:  -nc, --noconsole |
+| silent | Do not show any output, only warnings and errors will be shown.<br> Supported formats:  -s, --silent |
+| dgml | Export dependency graph to a dgml file.<br> Supported formats:  -dg \<filename\> |
+| dot | Export dependency graph to a [DOT](https://en.wikipedia.org/wiki/DOT_(graph_description_language)) file.<br> Supported formats:  -dt \<filename\> |
 | xml | Export dependency graph to a xml file.<br> Supported formats:  -x \<filename\> |
 | rsw | Will only analyze assemblies if their referenced assemblies starts with the given value.<br> Supported formats:  -rsw \<string\>, --referencedstartswith \<string\> |
-| i | include subdirectories in search.<br> Supported formats:  -i, --includesub |
-| c | use the binding redirects of the given configuration file (Web.config or App.config) <br> Supported formats: -c \<string>, --configurationFile \<string> |
-| f | whether to exit with an error code when AsmSpy detected Assemblies which could not be found <br> Supported formats. -f, --failOnMissing |
+| i | Include subdirectories in search.<br> Supported formats:  -i, --includesub |
+| c | Use the binding redirects of the given configuration file (Web.config or App.config) <br> Supported formats: -c \<string>, --configurationFile \<string> |
+| f | Whether to exit with an error code when AsmSpy detected Assemblies which could not be found <br> Supported formats. -f, --failOnMissing |
 
 ### Examples
 To see a list of all assemblies and all references, just add the 'all' flag:

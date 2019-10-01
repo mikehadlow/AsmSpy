@@ -30,8 +30,10 @@ namespace AsmSpy.Core
                 return true;
             }
 
-            return assemblyName.Name.StartsWith("System", StringComparison.OrdinalIgnoreCase) ||
-                assemblyName.Name.StartsWith("mscorlib", StringComparison.OrdinalIgnoreCase);
+            return assemblyName.Name.StartsWith("System.", StringComparison.OrdinalIgnoreCase) ||
+                assemblyName.Name.StartsWith("mscorlib", StringComparison.OrdinalIgnoreCase) ||
+                assemblyName.Name.StartsWith("Microsoft.", StringComparison.OrdinalIgnoreCase) ||
+                assemblyName.Name.StartsWith("netstandard", StringComparison.OrdinalIgnoreCase);
         }
     }
 }

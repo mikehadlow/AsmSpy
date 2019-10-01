@@ -17,6 +17,7 @@ namespace AsmSpy.CommandLine
             var commandLineApplication = new CommandLineApplication(throwOnUnexpectedArg: true);
             var directoryOrFile = commandLineApplication.Argument("directoryOrFile", "The directory to search for assemblies or file path to a single assembly");
             var dgmlExport = commandLineApplication.Option("-dg|--dgml <filename>", "Export to a dgml file", CommandOptionType.SingleValue);
+            var dotExport = commandLineApplication.Option("-dt|--dot <filename>", "Export to a DOT file", CommandOptionType.SingleValue);
             var nonsystem = commandLineApplication.Option("-n|--nonsystem", "Ignore 'System' assemblies", CommandOptionType.NoValue);
             var all = commandLineApplication.Option("-a|--all", "List all assemblies and references.", CommandOptionType.NoValue);
             var noconsole = commandLineApplication.Option("-nc|--noconsole", "Do not show references on console.", CommandOptionType.NoValue);
@@ -109,6 +110,17 @@ namespace AsmSpy.CommandLine
                 {
                     IDependencyVisualizer export = new DgmlExport(result, string.IsNullOrWhiteSpace(dgmlExport.Value()) ? Path.Combine(directoryInfo.FullName, "references.dgml") : dgmlExport.Value(), consoleLogger) { SkipSystem = skipSystem };
                     export.Visualize();
+                }
+
+                if (dotExport.HasValue())
+                {
+                    var dot = new DotExport(
+                        result, 
+                        string.IsNullOrWhiteSpace(dotExport.Value()) 
+                            ? Path.Combine(directoryInfo.FullName, "references.gv") 
+                            : dotExport.Value(), consoleLogger) 
+                        { SkipSystem = skipSystem };
+                    dot.Visualize();
                 }
 
                 if (xml.HasValue())

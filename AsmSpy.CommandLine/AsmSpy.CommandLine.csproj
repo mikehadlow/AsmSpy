@@ -66,6 +66,7 @@
     <Compile Include="ConsoleLogger.cs" />
     <Compile Include="ConsoleVisualizer.cs" />
     <Compile Include="DgmlExport.cs" />
+    <Compile Include="DotExport.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
