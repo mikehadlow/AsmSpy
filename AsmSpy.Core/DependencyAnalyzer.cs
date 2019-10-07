@@ -65,7 +65,6 @@ namespace AsmSpy.Core
 
             foreach (var fileInfo in result.AnalyzedFiles.OrderBy(asm => asm.Name))
             {
-                logger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Checking file {0}", fileInfo.Name));
                 Assembly assembly;
                 try
                 {
@@ -74,10 +73,11 @@ namespace AsmSpy.Core
                         continue;
                     }
                     assembly = Assembly.ReflectionOnlyLoadFrom(fileInfo.FullName);
+                    logger.LogMessage($"Checking file {fileInfo.FullName} => {assembly.GetName().Name} {assembly.GetName().Version.ToString()}");
                 }
                 catch (Exception ex)
                 {
-                    logger.LogWarning(string.Format(CultureInfo.InvariantCulture, "Failed to load assembly '{0}': {1}", fileInfo.FullName, ex.Message));
+                    logger.LogWarning($"Failed to load assembly '{fileInfo.FullName}': {ex.Message}");
                     continue;
                 }
 
@@ -108,7 +108,7 @@ namespace AsmSpy.Core
                 {
                     continue;
                 }
-                logger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Checking reference {0}", assembly.AssemblyName.Name));
+                logger.LogMessage($"Checking reference {assembly.AssemblyName.Name}");
                 try
                 {
                     assembly.ReflectionOnlyAssembly = Assembly.ReflectionOnlyLoad(assembly.AssemblyName.FullName);
