@@ -1,7 +1,6 @@
 using AsmSpy.Core.Native;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -36,7 +35,9 @@ namespace AsmSpy.Core
                 return null;
             }
 
-            var assemblyFullName = AppDomainWithBindingRedirects != null ? AppDomainWithBindingRedirects.ApplyPolicy(assemblyName.FullName) : assemblyName.FullName;
+            var assemblyFullName = AppDomainWithBindingRedirects != null 
+                ? AppDomainWithBindingRedirects.ApplyPolicy(assemblyName.FullName) 
+                : assemblyName.FullName;
 
             if (assemblies.TryGetValue(assemblyFullName, out AssemblyReferenceInfo assemblyReferenceInfo))
             {
@@ -55,25 +56,21 @@ namespace AsmSpy.Core
             {
                 throw new ArgumentNullException(nameof(logger));
             }
-            var result = new DependencyAnalyzerResult(Files.ToArray());
 
+            var result = new DependencyAnalyzerResult(Files.ToArray());
 
             if (result.AnalyzedFiles.Count <= 0)
             {
                 return result;
             }
 
-            foreach (var fileInfo in result.AnalyzedFiles.OrderBy(asm => asm.Name))
+            foreach (var fileInfo in result.AnalyzedFiles.Where(x => x.IsAssembly()).OrderBy(asm => asm.Name))
             {
                 Assembly assembly;
                 try
                 {
-                    if (!fileInfo.IsAssembly())
-                    {
-                        continue;
-                    }
                     assembly = Assembly.ReflectionOnlyLoadFrom(fileInfo.FullName);
-                    logger.LogMessage($"Checking file {fileInfo.FullName} => {assembly.GetName().Name} {assembly.GetName().Version.ToString()}");
+                    logger.LogMessage($"File {fileInfo.FullName} => {assembly.GetName().Name} {assembly.GetName().Version.ToString()}");
                 }
                 catch (Exception ex)
                 {
@@ -89,6 +86,7 @@ namespace AsmSpy.Core
 
                 assemblyReferenceInfo.ReflectionOnlyAssembly = assembly;
                 assemblyReferenceInfo.AssemblySource = AssemblySource.Local;
+
                 foreach (var referencedAssembly in assembly.GetReferencedAssemblies())
                 {
                     var referencedAssemblyReferenceInfo = GetAssemblyReferenceInfo(result.Assemblies, referencedAssembly);
@@ -102,21 +100,21 @@ namespace AsmSpy.Core
                 }
             }
 
-            foreach (var assembly in result.Assemblies.Values)
+            foreach (var assembly in result.Assemblies.Values.Where(x => x.ReflectionOnlyAssembly == null))
             {
-                if (assembly.ReflectionOnlyAssembly != null)
-                {
-                    continue;
-                }
-                logger.LogMessage($"Checking reference {assembly.AssemblyName.Name}");
                 try
                 {
                     assembly.ReflectionOnlyAssembly = Assembly.ReflectionOnlyLoad(assembly.AssemblyName.FullName);
-                    assembly.AssemblySource = assembly.ReflectionOnlyAssembly.GlobalAssemblyCache ? AssemblySource.GlobalAssemblyCache : AssemblySource.Unknown;
+                    assembly.AssemblySource = assembly.ReflectionOnlyAssembly.GlobalAssemblyCache 
+                        ? AssemblySource.GlobalAssemblyCache 
+                        : AssemblySource.Unknown;
+
+                    logger.LogMessage($"Found reference {assembly.AssemblyName.Name}");
                 }
                 catch
                 {
-                    // TODO: Show message?
+                    logger.LogWarning($"Could not load reference {assembly.AssemblyName.Name} {assembly.AssemblyName.Version.ToString()}");
+                    assembly.AssemblySource = AssemblySource.NotFound;
                 }
             }
             return result;

@@ -92,6 +92,8 @@ namespace AsmSpy.CommandLine
                     return -1;
                 }
 
+                // IDependencyAnalyzer seems to be pointless polymorphism, and there's no logic to the
+                // separation between constructor arguments and the argument to Analyze(..)
                 IDependencyAnalyzer analyzer = new DependencyAnalyzer(fileList, appDomainWithBindingRedirects)
                 {
                     SkipSystem = skipSystem,
