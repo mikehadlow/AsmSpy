@@ -59,6 +59,7 @@ namespace AsmSpy.CommandLine
             if (dotExport.HasValue())
             {
                 exportFileName = dotExport.Value();
+                return true;
             }
             return false;
         }
