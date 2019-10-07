@@ -1,5 +1,4 @@
 using AsmSpy.Core.Native;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,8 +10,6 @@ namespace AsmSpy.Core
 {
     public class DependencyAnalyzer : IDependencyAnalyzer
     {
-        #region Properties
-
         public virtual IEnumerable<FileInfo> Files { get; }
 
         protected virtual AppDomain AppDomainWithBindingRedirects { get; }
@@ -20,10 +17,6 @@ namespace AsmSpy.Core
         public bool SkipSystem { get; set; }
 
         public string ReferencedStartsWith { get; set; }
-
-        #endregion
-
-        #region Analyze Support
 
         public DependencyAnalyzer(IEnumerable<FileInfo> files, AppDomain appDomainWithBindingRedirects = null)
         {
@@ -129,8 +122,6 @@ namespace AsmSpy.Core
             }
             return result;
         }
-
-        #endregion
     }
 }
 
