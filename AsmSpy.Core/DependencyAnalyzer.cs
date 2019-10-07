@@ -38,8 +38,7 @@ namespace AsmSpy.Core
 
             var assemblyFullName = AppDomainWithBindingRedirects != null ? AppDomainWithBindingRedirects.ApplyPolicy(assemblyName.FullName) : assemblyName.FullName;
 
-            AssemblyReferenceInfo assemblyReferenceInfo;
-            if (assemblies.TryGetValue(assemblyFullName, out assemblyReferenceInfo))
+            if (assemblies.TryGetValue(assemblyFullName, out AssemblyReferenceInfo assemblyReferenceInfo))
             {
                 return assemblyReferenceInfo;
             }
