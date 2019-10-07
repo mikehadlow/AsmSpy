@@ -5,41 +5,31 @@ using System.Linq;
 using System.Reflection;
 using System.Xml;
 using AsmSpy.Core;
+using Microsoft.Extensions.CommandLineUtils;
 using static System.FormattableString;
 
 namespace AsmSpy.CommandLine
 {
     public class BindingRedirectExport : IDependencyVisualizer
     {
-        private readonly IDependencyAnalyzerResult _result;
-        private readonly string _exportFileName;
-        private readonly ILogger _logger;
-
-        public BindingRedirectExport(IDependencyAnalyzerResult result, string exportFileName, ILogger logger)
-        {
-            _result = result;
-            _exportFileName = exportFileName;
-            _logger = logger;
-        }
-
-        public void Visualize()
+        public void Visualize(IDependencyAnalyzerResult result, ILogger logger, VisualizerOptions visualizerOptions)
         {
             try
             {
-                var document = Generate(_result, skipSystem: false);
-                using (var writer = XmlWriter.Create(_exportFileName, new XmlWriterSettings{Indent = true}))
+                var document = Generate(result, skipSystem: false);
+                using (var writer = XmlWriter.Create(outputFile, new XmlWriterSettings{Indent = true}))
                 {
                     document.WriteTo(writer);
                 }
-                _logger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Exported to file {0}", _exportFileName));
+                logger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Exported to file {0}", outputFile));
             }
             catch (UnauthorizedAccessException uae)
             {
-                _logger.LogError(string.Format(CultureInfo.InvariantCulture, "Could not write file {0} due to error {1}", _exportFileName, uae.Message));
+                logger.LogError(string.Format(CultureInfo.InvariantCulture, "Could not write file {0} due to error {1}", outputFile, uae.Message));
             }
             catch (DirectoryNotFoundException dnfe)
             {
-                _logger.LogError(string.Format(CultureInfo.InvariantCulture, "Could not write file {0} due to error {1}", _exportFileName, dnfe.Message));
+                logger.LogError(string.Format(CultureInfo.InvariantCulture, "Could not write file {0} due to error {1}", outputFile, dnfe.Message));
             }
         }
 
@@ -113,6 +103,27 @@ namespace AsmSpy.CommandLine
                 return null;
 
             return string.Join(string.Empty, bytes.Select(@byte => @byte.ToString("x2", CultureInfo.InvariantCulture)));
+        }
+
+        private CommandOption bindingRedirect;
+        private string outputFile;
+
+        public void CreateOption(CommandLineApplication commandLineApplication)
+        {
+            bindingRedirect = commandLineApplication.Option("-b|--bindingredirect <filename>", "Create binding-redirects", CommandOptionType.SingleValue);
+        }
+
+        public bool IsConfigured()
+        {
+            if (bindingRedirect.HasValue())
+            {
+                if(string.IsNullOrWhiteSpace(bindingRedirect.Value()))
+                {
+                    outputFile = bindingRedirect.Value();
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

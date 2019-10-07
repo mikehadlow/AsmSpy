@@ -1,7 +1,5 @@
 using AsmSpy.Core;
-
 using Microsoft.Extensions.CommandLineUtils;
-
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -16,22 +14,28 @@ namespace AsmSpy.CommandLine
         {
             var commandLineApplication = new CommandLineApplication(throwOnUnexpectedArg: true);
             var directoryOrFile = commandLineApplication.Argument("directoryOrFile", "The directory to search for assemblies or file path to a single assembly");
-            var dgmlExport = commandLineApplication.Option("-dg|--dgml <filename>", "Export to a dgml file", CommandOptionType.SingleValue);
-            var dotExport = commandLineApplication.Option("-dt|--dot <filename>", "Export to a DOT file", CommandOptionType.SingleValue);
+
+            var silent = commandLineApplication.Option("-s|--silent", "Do not show any message, only warnings and errors will be shown.", CommandOptionType.NoValue);
+
             var nonsystem = commandLineApplication.Option("-n|--nonsystem", "Ignore 'System' assemblies", CommandOptionType.NoValue);
             var all = commandLineApplication.Option("-a|--all", "List all assemblies and references.", CommandOptionType.NoValue);
-            var noconsole = commandLineApplication.Option("-nc|--noconsole", "Do not show references on console.", CommandOptionType.NoValue);
-            var silent = commandLineApplication.Option("-s|--silent", "Do not show any message, only warnings and errors will be shown.", CommandOptionType.NoValue);
-            var bindingRedirect = commandLineApplication.Option("-b|--bindingredirect", "Create binding-redirects", CommandOptionType.NoValue);
             var referencedStartsWith = commandLineApplication.Option("-rsw|--referencedstartswith", "Referenced Assembly should start with <string>. Will only analyze assemblies if their referenced assemblies starts with the given value.", CommandOptionType.SingleValue);
+
             var includeSubDirectories = commandLineApplication.Option("-i|--includesub", "Include subdirectories in search", CommandOptionType.NoValue);
             var configurationFile = commandLineApplication.Option("-c|--configurationFile", "Use the binding redirects of the given configuration file (Web.config or App.config)", CommandOptionType.SingleValue);
             var failOnMissing = commandLineApplication.Option("-f|--failOnMissing", "Whether to exit with an error code when AsmSpy detected Assemblies which could not be found", CommandOptionType.NoValue);
-            var xml = commandLineApplication.Option("-x|--xml <filename>", "Export to a xml file", CommandOptionType.SingleValue);
+
+            var dependencyVisualizers = GetDependencyVisualizers();
+            foreach(var visualizer in dependencyVisualizers)
+            {
+                visualizer.CreateOption(commandLineApplication);
+            }
 
             commandLineApplication.HelpOption("-? | -h | --help");
+
             commandLineApplication.OnExecute(() =>
             {
+
                 var consoleLogger = new ConsoleLogger(!silent.HasValue());
 
                 var directoryOrFilePath = directoryOrFile.Value;
@@ -62,6 +66,12 @@ namespace AsmSpy.CommandLine
                 var onlyConflicts = !all.HasValue();
                 var skipSystem = nonsystem.HasValue();
                 var searchPattern = includeSubDirectories.HasValue() ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+
+                var visualizerOptions = new VisualizerOptions(
+                        skipSystem,
+                        onlyConflicts,
+                        referencedStartsWith.HasValue() ? referencedStartsWith.Value() : string.Empty
+                    );
 
                 var directoryInfo = new DirectoryInfo(directoryPath);
 
@@ -99,56 +109,21 @@ namespace AsmSpy.CommandLine
                     SkipSystem = skipSystem,
                     ReferencedStartsWith = referencedStartsWith.HasValue() ? referencedStartsWith.Value() : string.Empty
                 };
-
                 var result = analyzer.Analyze(consoleLogger);
 
-                if (!noconsole.HasValue())
+                foreach(var visualizer in dependencyVisualizers.Where(x => x.IsConfigured()))
                 {
-                    IDependencyVisualizer visualizer = new ConsoleVisualizer(result) { OnlyConflicts = onlyConflicts };
-                    visualizer.Visualize();
-                }
-
-                if (dgmlExport.HasValue())
-                {
-                    IDependencyVisualizer export = new DgmlExport(result, string.IsNullOrWhiteSpace(dgmlExport.Value()) ? Path.Combine(directoryInfo.FullName, "references.dgml") : dgmlExport.Value(), consoleLogger) { SkipSystem = skipSystem };
-                    export.Visualize();
-                }
-
-                if (dotExport.HasValue())
-                {
-                    var dot = new DotExport(
-                        result, 
-                        string.IsNullOrWhiteSpace(dotExport.Value()) 
-                            ? Path.Combine(directoryInfo.FullName, "references.gv") 
-                            : dotExport.Value(), consoleLogger) 
-                        { SkipSystem = skipSystem };
-                    dot.Visualize();
-                }
-
-                if (xml.HasValue())
-                {
-                    var export = new XmlExport(result, string.IsNullOrWhiteSpace(xml.Value()) ? Path.Combine(directoryInfo.FullName, "references.xml") : xml.Value(), consoleLogger)
-                    {
-                        SkipSystem = skipSystem,
-                        OnlyConflicts = onlyConflicts,
-                        ReferencedStartsWith = referencedStartsWith.HasValue() ? referencedStartsWith.Value() : string.Empty
-                    };
-                    export.Visualize();
-                }
-
-                if (bindingRedirect.HasValue())
-                {
-                    // binding redirect export explicitly doesn't respect SkipSystem
-                    IDependencyVisualizer bindingRedirects = new BindingRedirectExport(result, string.IsNullOrWhiteSpace(dgmlExport.Value()) ? Path.Combine(directoryInfo.FullName, "bindingRedirects.xml") : dgmlExport.Value(), consoleLogger);
-                    bindingRedirects.Visualize();
+                    visualizer.Visualize(result, consoleLogger, visualizerOptions);
                 }
 
                 if (failOnMissing.HasValue() && result.MissingAssemblies.Any())
                 {
                     return -1;
                 }
+
                 return 0;
             });
+
             try
             {
                 if (args == null || args.Length == 0)
@@ -170,5 +145,14 @@ namespace AsmSpy.CommandLine
                 return -1;
             }
         }
+
+        private static IDependencyVisualizer[] GetDependencyVisualizers() => new IDependencyVisualizer[]
+        {
+            new ConsoleVisualizer(),
+            new DgmlExport(),
+            new XmlExport(),
+            new DotExport(),
+            new BindingRedirectExport()
+        };
     }
 }

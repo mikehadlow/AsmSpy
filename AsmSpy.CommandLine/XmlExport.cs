@@ -3,35 +3,23 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using AsmSpy.Core;
+using Microsoft.Extensions.CommandLineUtils;
 
 namespace AsmSpy.CommandLine
 {
     public sealed class XmlExport : IDependencyVisualizer
     {
-        private readonly IDependencyAnalyzerResult _result;
-        private readonly string _fileName;
-        private readonly ILogger _logger;
+        private string outputFile;
 
-        public string ReferencedStartsWith { get; set; }
-        public bool SkipSystem { get; set; }
-        public bool OnlyConflicts { get; set; }
-
-        public XmlExport(IDependencyAnalyzerResult result, string fileName, ILogger logger)
+        public void Visualize(IDependencyAnalyzerResult result, ILogger logger, VisualizerOptions visualizerOptions)
         {
-            _result = result ?? throw new ArgumentNullException(nameof(result));
-            _fileName = fileName?.Trim();
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
-        public void Visualize()
-        {
-            if (string.IsNullOrWhiteSpace(_fileName))
+            if (string.IsNullOrWhiteSpace(outputFile))
             {
-                _logger.LogError("No valid filename specified.");
+                logger.LogError("No valid filename specified.");
                 return;
             }
 
-            _logger.LogMessage($"Exporting to {_fileName}...");
+            logger.LogMessage($"Exporting to {outputFile}...");
 
             var settings = new XmlWriterSettings
             {
@@ -40,28 +28,28 @@ namespace AsmSpy.CommandLine
                 CloseOutput = false
             };
 
-            using (var stream = File.Open(_fileName, FileMode.Create, FileAccess.Write, FileShare.Read))
+            using (var stream = File.Open(outputFile, FileMode.Create, FileAccess.Write, FileShare.Read))
             using (var writer = XmlWriter.Create(stream, settings))
             {
                 writer.WriteStartDocument();
-                WriteAssemblies(writer);
+                WriteAssemblies(writer, result, visualizerOptions);
                 writer.WriteEndDocument();
             }
         }
 
-        private void WriteAssemblies(XmlWriter writer)
+        private void WriteAssemblies(XmlWriter writer, IDependencyAnalyzerResult result, VisualizerOptions visualizerOptions)
         {
             writer.WriteStartElement("Assemblies");
-            var assemblyGroups = _result.Assemblies.Values.GroupBy(x => x.RedirectedAssemblyName);
+            var assemblyGroups = result.Assemblies.Values.GroupBy(x => x.RedirectedAssemblyName);
             foreach (var assemblyGroup in assemblyGroups.OrderBy(i => i.Key.Name))
             {
-                if (SkipSystem && AssemblyInformationProvider.IsSystemAssembly(assemblyGroup.Key))
+                if (visualizerOptions.SkipSystem && AssemblyInformationProvider.IsSystemAssembly(assemblyGroup.Key))
                 {
                     continue;
                 }
 
                 var assemblyInfos = assemblyGroup.OrderBy(x => x.AssemblyName.Name).ToList();
-                if (OnlyConflicts && assemblyInfos.Count <= 1)
+                if (visualizerOptions.OnlyConflicts && assemblyInfos.Count <= 1)
                 {
                     if (assemblyInfos.Count == 1 && assemblyInfos[0].AssemblySource == AssemblySource.Local)
                     {
@@ -76,8 +64,8 @@ namespace AsmSpy.CommandLine
                 // Got any references? Respect the user's choices here.
                 var referenced = assemblyInfos.SelectMany(x => x.ReferencedBy)
                     .GroupBy(x => x.AssemblyName.Name)
-                    .Where(x => x.Key.ToUpperInvariant().StartsWith(ReferencedStartsWith.ToUpperInvariant(), StringComparison.OrdinalIgnoreCase));
-                if (!string.IsNullOrEmpty(ReferencedStartsWith) && !referenced.Any())
+                    .Where(x => x.Key.ToUpperInvariant().StartsWith(visualizerOptions.ReferencedStartsWith.ToUpperInvariant(), StringComparison.OrdinalIgnoreCase));
+                if (!string.IsNullOrEmpty(visualizerOptions.ReferencedStartsWith) && !referenced.Any())
                 {
                     continue;
                 }
@@ -101,9 +89,9 @@ namespace AsmSpy.CommandLine
                             foreach (var referer in assemblyInfo.ReferencedBy.OrderBy(x => x.AssemblyName.ToString()))
                             {
                                 // Skip this referer? Respect the user's choices here.
-                                if (!string.IsNullOrEmpty(ReferencedStartsWith))
+                                if (!string.IsNullOrEmpty(visualizerOptions.ReferencedStartsWith))
                                 {
-                                    if (!referer.AssemblyName.Name.ToUpperInvariant().StartsWith(ReferencedStartsWith.ToUpperInvariant(), StringComparison.OrdinalIgnoreCase))
+                                    if (!referer.AssemblyName.Name.ToUpperInvariant().StartsWith(visualizerOptions.ReferencedStartsWith.ToUpperInvariant(), StringComparison.OrdinalIgnoreCase))
                                     {
                                         continue;
                                     }
@@ -121,6 +109,22 @@ namespace AsmSpy.CommandLine
                 }
             }
             writer.WriteEndElement();
+        }
+
+        private CommandOption xml;
+
+        public void CreateOption(CommandLineApplication commandLineApplication)
+        {
+            xml = commandLineApplication.Option("-x|--xml <filename>", "Export to a xml file", CommandOptionType.SingleValue);
+        }
+
+        public bool IsConfigured()
+        {
+            if (xml.HasValue())
+            {
+                outputFile = xml.Value();
+            }
+            return false;
         }
     }
 }

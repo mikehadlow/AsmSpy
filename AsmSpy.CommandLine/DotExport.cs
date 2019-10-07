@@ -1,32 +1,22 @@
 ﻿using AsmSpy.Core;
+using Microsoft.Extensions.CommandLineUtils;
 using System.IO;
 
 namespace AsmSpy.CommandLine
 {
     public class DotExport : IDependencyVisualizer
     {
-        private readonly IDependencyAnalyzerResult _result;
-        private readonly string _exportFileName;
-        private readonly ILogger _logger;
+        private string exportFileName;
 
-        public bool SkipSystem { get; set; } = false;
-
-        public DotExport(IDependencyAnalyzerResult result, string exportFileName, ILogger logger)
+        public void Visualize(IDependencyAnalyzerResult result, ILogger logger, VisualizerOptions visualizerOptions)
         {
-            _result = result;
-            _exportFileName = exportFileName;
-            _logger = logger;
-        }
-
-        public void Visualize()
-        {
-            using(var writer = new StreamWriter(_exportFileName))
+            using(var writer = new StreamWriter(exportFileName))
             {
                 writer.WriteLine("digraph {");
 
-                foreach (var assemblyReference in _result.Assemblies.Values)
+                foreach (var assemblyReference in result.Assemblies.Values)
                 {
-                    if (SkipSystem && assemblyReference.IsSystem)
+                    if (visualizerOptions.SkipSystem && assemblyReference.IsSystem)
                         continue;
 
                     var redBackground = ", color=red";
@@ -38,14 +28,14 @@ namespace AsmSpy.CommandLine
 
                 writer.WriteLine();
 
-                foreach (var assemblyReference in _result.Assemblies.Values)
+                foreach (var assemblyReference in result.Assemblies.Values)
                 {
-                    if (SkipSystem && assemblyReference.IsSystem)
+                    if (visualizerOptions.SkipSystem && assemblyReference.IsSystem)
                         continue;
 
                     foreach (var referenceTo in assemblyReference.References)
                     {
-                        if (SkipSystem && referenceTo.IsSystem)
+                        if (visualizerOptions.SkipSystem && referenceTo.IsSystem)
                             continue;
 
                         writer.WriteLine($"    {assemblyReference.AssemblyName.FullName.GetHashCode()} -> {referenceTo.AssemblyName.FullName.GetHashCode()};");
@@ -54,7 +44,23 @@ namespace AsmSpy.CommandLine
 
                 writer.WriteLine("}");
             }
-            _logger.LogMessage($"Exported to file {_exportFileName}");
+            logger.LogMessage($"Exported to file {exportFileName}");
+        }
+
+        private CommandOption dotExport;
+
+        public void CreateOption(CommandLineApplication commandLineApplication)
+        {
+            dotExport = commandLineApplication.Option("-dt|--dot <filename>", "Export to a DOT file", CommandOptionType.SingleValue);
+        }
+
+        public bool IsConfigured()
+        {
+            if (dotExport.HasValue())
+            {
+                exportFileName = dotExport.Value();
+            }
+            return false;
         }
     }
 }

@@ -68,9 +68,11 @@
     <Compile Include="DgmlExport.cs" />
     <Compile Include="DotExport.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="IDependencyVisualizer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\XmlWriterElementScope.cs" />
+    <Compile Include="VisualizerOptions.cs" />
     <Compile Include="XmlExport.cs" />
     <Compile Include="Utilities\XmlWriterExtensions.cs" />
   </ItemGroup>

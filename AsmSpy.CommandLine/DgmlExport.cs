@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using AsmSpy.Core;
+using Microsoft.Extensions.CommandLineUtils;
 using static System.FormattableString;
 
 namespace AsmSpy.CommandLine
@@ -17,24 +18,26 @@ namespace AsmSpy.CommandLine
             { AssemblySource.Unknown, Color.Gray },
         };
 
-        private readonly IDependencyAnalyzerResult _result;
-        private readonly string _exportFileName;
-        private readonly ILogger _logger;
+        private string _exportFileName;
 
-        public DgmlExport(IDependencyAnalyzerResult result, string exportFileName, ILogger logger)
+        private CommandOption dgmlExport;
+
+        public void CreateOption(CommandLineApplication commandLineApplication)
         {
-            _result = result;
-            _exportFileName = exportFileName;
-            _logger = logger;
+            dgmlExport = commandLineApplication.Option("-dg|--dgml <filename>", "Export to a dgml file", CommandOptionType.SingleValue);
         }
 
-        #region Properties
+        public bool IsConfigured()
+        {
+            if (dgmlExport.HasValue())
+            {
+                _exportFileName = dgmlExport.Value();
+                return true;
+            }
+            return false;
+        }
 
-        public bool SkipSystem { get; set; }
-
-        #endregion
-
-        public void Visualize()
+        public void Visualize(IDependencyAnalyzerResult result, ILogger logger, VisualizerOptions visualizerOptions)
         {
             Stream fileStream = null;
             try
@@ -48,9 +51,9 @@ namespace AsmSpy.CommandLine
                     dgml.WriteLine(@"<DirectedGraph Title=""AsmSpy:References"" xmlns=""http://schemas.microsoft.com/vs/2009/dgml"">");
 
                     dgml.WriteLine(@"<Nodes>");
-                    foreach (var assemblyReference in _result.Assemblies.Values)
+                    foreach (var assemblyReference in result.Assemblies.Values)
                     {
-                        if (SkipSystem && assemblyReference.IsSystem)
+                        if (visualizerOptions.SkipSystem && assemblyReference.IsSystem)
                             continue;
 
                         dgml.WriteLine(Invariant($@"<Node Id=""{assemblyReference.AssemblyName.FullName}"" Label=""{assemblyReference.AssemblyName.Name}"" Category=""Assembly"">"));
@@ -62,14 +65,14 @@ namespace AsmSpy.CommandLine
 
                     dgml.WriteLine(@"<Links>");
 
-                    foreach (var assemblyReference in _result.Assemblies.Values)
+                    foreach (var assemblyReference in result.Assemblies.Values)
                     {
-                        if (SkipSystem && assemblyReference.IsSystem)
+                        if (visualizerOptions.SkipSystem && assemblyReference.IsSystem)
                             continue;
 
                         foreach (var referenceTo in assemblyReference.References)
                         {
-                            if (SkipSystem && referenceTo.IsSystem)
+                            if (visualizerOptions.SkipSystem && referenceTo.IsSystem)
                                 continue;
 
                             dgml.WriteLine(Invariant($@"<Link Source=""{assemblyReference.AssemblyName.FullName}"" Target=""{referenceTo.AssemblyName.FullName}"" Category=""Reference"" />"));
@@ -104,15 +107,15 @@ namespace AsmSpy.CommandLine
                     dgml.WriteLine(@"</DirectedGraph>");
                 }
 
-                _logger.LogMessage(Invariant($"Exported to file {_exportFileName}"));
+                logger.LogMessage(Invariant($"Exported to file {_exportFileName}"));
             }
             catch (UnauthorizedAccessException uae)
             {
-                _logger.LogError(Invariant($"Could not write file {_exportFileName} due to error {uae.Message}"));
+                logger.LogError(Invariant($"Could not write file {_exportFileName} due to error {uae.Message}"));
             }
             catch (DirectoryNotFoundException dnfe)
             {
-                _logger.LogError(Invariant($"Could not write file {_exportFileName} due to error {dnfe.Message}"));
+                logger.LogError(Invariant($"Could not write file {_exportFileName} due to error {dnfe.Message}"));
             }
             finally
             {

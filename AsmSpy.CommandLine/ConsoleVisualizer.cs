@@ -1,5 +1,5 @@
 using AsmSpy.Core;
-
+using Microsoft.Extensions.CommandLineUtils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,48 +15,25 @@ namespace AsmSpy.CommandLine
         private const ConsoleColor AssemblyGlobalAssemblyCacheColor = ConsoleColor.Yellow;
         private const ConsoleColor AssemblyUnknownColor = ConsoleColor.Magenta;
 
-        #region Fields
-
-        private readonly IDependencyAnalyzerResult _analyzerResult;
-
-        #endregion
-
-        #region Properties
-
-        public bool OnlyConflicts { get; set; }
-
-        #endregion
-
-        #region Constructor
-
-        public ConsoleVisualizer(IDependencyAnalyzerResult result)
+        public virtual void Visualize(IDependencyAnalyzerResult result, ILogger logger, VisualizerOptions visualizerOptions)
         {
-            _analyzerResult = result;
-        }
-
-        #endregion
-
-        #region Visualize Support
-
-        public virtual void Visualize()
-        {
-            if (_analyzerResult.AnalyzedFiles.Count <= 0)
+            if (result.AnalyzedFiles.Count <= 0)
             {
                 Console.WriteLine(AsmSpy_CommandLine.No_assemblies_files_found_in_directory);
                 return;
             }
 
-            if (OnlyConflicts)
+            if (visualizerOptions.OnlyConflicts)
             {
                 Console.WriteLine(AsmSpy_CommandLine.Detailing_only_conflicting_assembly_references);
             }
 
-            var assemblyGroups = _analyzerResult.Assemblies.Values.GroupBy(x => x.RedirectedAssemblyName);
+            var assemblyGroups = result.Assemblies.Values.GroupBy(x => x.RedirectedAssemblyName);
 
             foreach (var assemblyGroup in assemblyGroups.OrderBy(i => i.Key.Name))
             {
                 var assemblyInfos = assemblyGroup.OrderBy(x => x.AssemblyName.Name).ToList();
-                if (OnlyConflicts && assemblyInfos.Count <= 1)
+                if (visualizerOptions.OnlyConflicts && assemblyInfos.Count <= 1)
                 {
                     if (assemblyInfos.Count == 1 && assemblyInfos[0].AssemblySource == AssemblySource.Local)
                     {
@@ -162,6 +139,13 @@ namespace AsmSpy.CommandLine
             }
         }
 
-        #endregion
+        CommandOption noConsole;
+
+        public void CreateOption(CommandLineApplication commandLineApplication)
+        {
+            noConsole = commandLineApplication.Option("-nc|--noconsole", "Do not show references on console.", CommandOptionType.NoValue);
+        }
+
+        public bool IsConfigured() => !noConsole.HasValue();
     }
 }
