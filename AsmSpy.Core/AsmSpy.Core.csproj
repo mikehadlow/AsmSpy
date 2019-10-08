@@ -83,8 +83,6 @@
     <Compile Include="DependencyAnalyzerResult.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="IAssemblyReferenceInfo.cs" />
-    <Compile Include="IDependencyAnalyzer.cs" />
-    <Compile Include="IDependencyAnalyzerResult.cs" />
     <Compile Include="ILogger.cs" />
     <Compile Include="Native\FileInfoExtensions.cs" />
     <Compile Include="Native\ImageDataDirectory.cs" />
@@ -96,6 +94,8 @@
     <Compile Include="Native\ImageOptionalHeader64.cs" />
     <Compile Include="Native\MachineType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Result.cs" />
+    <Compile Include="VisualizerOptions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

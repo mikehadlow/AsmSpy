@@ -7,36 +7,26 @@ using System.Reflection;
 
 namespace AsmSpy.Core
 {
-    public class DependencyAnalyzer : IDependencyAnalyzer
+    public static class DependencyAnalyzer
     {
-        public virtual IEnumerable<FileInfo> Files { get; }
-
-        protected virtual AppDomain AppDomainWithBindingRedirects { get; }
-
-        public bool SkipSystem { get; set; }
-
-        public string ReferencedStartsWith { get; set; }
-
-        public DependencyAnalyzer(IEnumerable<FileInfo> files, AppDomain appDomainWithBindingRedirects = null)
+        private static AssemblyReferenceInfo GetAssemblyReferenceInfo(
+            IDictionary<string, AssemblyReferenceInfo> assemblies, 
+            AssemblyName assemblyName,
+            AppDomain appDomainWithBindingRedirects,
+            VisualizerOptions options)
         {
-            Files = files;
-            AppDomainWithBindingRedirects = appDomainWithBindingRedirects;
-        }
-
-        private AssemblyReferenceInfo GetAssemblyReferenceInfo(IDictionary<string, AssemblyReferenceInfo> assemblies, AssemblyName assemblyName)
-        {
-            if (SkipSystem && AssemblyInformationProvider.IsSystemAssembly(assemblyName))
+            if (options.SkipSystem && AssemblyInformationProvider.IsSystemAssembly(assemblyName))
             {
                 return null;
             }
 
-            if (!string.IsNullOrEmpty(ReferencedStartsWith) && !assemblyName.FullName.StartsWith(ReferencedStartsWith, StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(options.ReferencedStartsWith) && !assemblyName.FullName.StartsWith(options.ReferencedStartsWith, StringComparison.OrdinalIgnoreCase))
             {
                 return null;
             }
 
-            var assemblyFullName = AppDomainWithBindingRedirects != null 
-                ? AppDomainWithBindingRedirects.ApplyPolicy(assemblyName.FullName) 
+            var assemblyFullName = appDomainWithBindingRedirects != null 
+                ? appDomainWithBindingRedirects.ApplyPolicy(assemblyName.FullName) 
                 : assemblyName.FullName;
 
             if (assemblies.TryGetValue(assemblyFullName, out AssemblyReferenceInfo assemblyReferenceInfo))
@@ -50,14 +40,18 @@ namespace AsmSpy.Core
         }
 
 
-        public virtual IDependencyAnalyzerResult Analyze(ILogger logger)
+        public static DependencyAnalyzerResult Analyze(
+            IEnumerable<FileInfo> files, 
+            AppDomain appDomainWithBindingRedirects,
+            ILogger logger,
+            VisualizerOptions options)
         {
             if (logger == null)
             {
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            var result = new DependencyAnalyzerResult(Files.ToArray());
+            var result = new DependencyAnalyzerResult(files.ToArray());
 
             if (result.AnalyzedFiles.Count <= 0)
             {
@@ -78,7 +72,7 @@ namespace AsmSpy.Core
                     continue;
                 }
 
-                var assemblyReferenceInfo = GetAssemblyReferenceInfo(result.Assemblies, assembly.GetName());
+                var assemblyReferenceInfo = GetAssemblyReferenceInfo(result.Assemblies, assembly.GetName(), appDomainWithBindingRedirects, options);
                 if (assemblyReferenceInfo == null)
                 {
                     continue;
@@ -89,7 +83,7 @@ namespace AsmSpy.Core
 
                 foreach (var referencedAssembly in assembly.GetReferencedAssemblies())
                 {
-                    var referencedAssemblyReferenceInfo = GetAssemblyReferenceInfo(result.Assemblies, referencedAssembly);
+                    var referencedAssemblyReferenceInfo = GetAssemblyReferenceInfo(result.Assemblies, referencedAssembly, appDomainWithBindingRedirects, options);
                     if (referencedAssemblyReferenceInfo == null)
                     {
                         continue;
@@ -100,7 +94,7 @@ namespace AsmSpy.Core
                 }
             }
 
-            foreach (var assembly in result.Assemblies.Values.Where(x => x.ReflectionOnlyAssembly == null))
+            foreach (var assembly in result.Assemblies.Values.Where(x => x.ReflectionOnlyAssembly == null).OrderBy(x => x.AssemblyName.Name))
             {
                 try
                 {
@@ -109,7 +103,7 @@ namespace AsmSpy.Core
                         ? AssemblySource.GlobalAssemblyCache 
                         : AssemblySource.Unknown;
 
-                    logger.LogMessage($"Found reference {assembly.AssemblyName.Name}");
+                    logger.LogMessage($"Found reference {assembly.AssemblyName.Name} {assembly.AssemblyName.Version.ToString()}");
                 }
                 catch
                 {

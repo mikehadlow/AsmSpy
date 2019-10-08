@@ -8,7 +8,7 @@ namespace AsmSpy.CommandLine
     {
         private string exportFileName;
 
-        public void Visualize(IDependencyAnalyzerResult result, ILogger logger, VisualizerOptions visualizerOptions)
+        public void Visualize(DependencyAnalyzerResult result, ILogger logger, VisualizerOptions visualizerOptions)
         {
             using(var writer = new StreamWriter(exportFileName))
             {

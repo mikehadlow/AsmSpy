@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace AsmSpy.CommandLine
+namespace AsmSpy.Core
 {
     public class VisualizerOptions
     {

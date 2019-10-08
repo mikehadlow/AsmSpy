@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace AsmSpy.Core
 {
-    public class DependencyAnalyzerResult : IDependencyAnalyzerResult
+    public class DependencyAnalyzerResult
     {
         public DependencyAnalyzerResult(ICollection<FileInfo> analyzedFiles)
         {

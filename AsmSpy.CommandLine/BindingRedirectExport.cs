@@ -12,7 +12,7 @@ namespace AsmSpy.CommandLine
 {
     public class BindingRedirectExport : IDependencyVisualizer
     {
-        public void Visualize(IDependencyAnalyzerResult result, ILogger logger, VisualizerOptions visualizerOptions)
+        public void Visualize(DependencyAnalyzerResult result, ILogger logger, VisualizerOptions visualizerOptions)
         {
             try
             {
@@ -33,7 +33,7 @@ namespace AsmSpy.CommandLine
             }
         }
 
-        public static XmlDocument Generate(IDependencyAnalyzerResult result, bool skipSystem)
+        public static XmlDocument Generate(DependencyAnalyzerResult result, bool skipSystem)
         {
             var document = new XmlDocument();
             document.LoadXml(@"

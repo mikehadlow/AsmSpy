@@ -37,7 +37,7 @@ namespace AsmSpy.CommandLine
             return false;
         }
 
-        public void Visualize(IDependencyAnalyzerResult result, ILogger logger, VisualizerOptions visualizerOptions)
+        public void Visualize(DependencyAnalyzerResult result, ILogger logger, VisualizerOptions visualizerOptions)
         {
             Stream fileStream = null;
             try

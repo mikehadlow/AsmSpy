@@ -5,14 +5,17 @@ using System.IO;
 using Xunit;
 using Xunit.Abstractions;
 using AsmSpy.Core.TestLibrary;
+using System.Collections.Generic;
 
 namespace AsmSpy.Core.Tests
 {
     public class DependencyAnalyzerTests
     {
         private readonly ITestOutputHelper output;
-        private readonly DependencyAnalyzer sut;
         private readonly TestLogger logger;
+
+        private IEnumerable<FileInfo> filesToAnalyse;
+        private VisualizerOptions options = new VisualizerOptions(false, false, "");
 
         public DependencyAnalyzerTests(ITestOutputHelper output)
         {
@@ -23,14 +26,13 @@ namespace AsmSpy.Core.Tests
             var testBinDirectory = Path.GetDirectoryName(thisAssembly.Location);
             output.WriteLine(testBinDirectory);
 
-            var filesToAnalyse = Directory.GetFiles(testBinDirectory, "*.dll").Select(x => new FileInfo(x));
-            sut = new DependencyAnalyzer(filesToAnalyse);
+            filesToAnalyse = Directory.GetFiles(testBinDirectory, "*.dll").Select(x => new FileInfo(x));
         }
 
         [Fact]
         public void AnalyzeShouldReturnTestAssemblies()
         {
-            var result = sut.Analyze(logger);
+            var result = DependencyAnalyzer.Analyze(filesToAnalyse, null, logger, options);
 
             Assert.Contains(result.Assemblies.Values, x => x.AssemblyName.Name == "AsmSpy.Core");
             Assert.Contains(result.Assemblies.Values, x => x.AssemblyName.Name == "AsmSpy.Core.Tests");
@@ -41,7 +43,7 @@ namespace AsmSpy.Core.Tests
         [Fact(Skip ="Fails in AppVeyor")]
         public void AnalyzeShouldReturnSystemAssemblies()
         {
-            var result = sut.Analyze(logger);
+            var result = DependencyAnalyzer.Analyze(filesToAnalyse, null, logger, options);
 
             Assert.Contains(result.Assemblies.Values, x => x.AssemblyName.Name == "mscorlib");
             Assert.Contains(result.Assemblies.Values, x => x.AssemblyName.Name == "netstandard");
@@ -51,8 +53,8 @@ namespace AsmSpy.Core.Tests
         [Fact]
         public void AnalyzeShouldNotReturnSystemAssembliesWhenFlagIsSet()
         {
-            sut.SkipSystem = true;
-            var result = sut.Analyze(logger);
+            var altOptions = new VisualizerOptions(true, false, "");
+            var result = DependencyAnalyzer.Analyze(filesToAnalyse, null, logger, altOptions);
 
             Assert.DoesNotContain(result.Assemblies.Values, x => x.AssemblyName.Name == "mscorlib");
             Assert.DoesNotContain(result.Assemblies.Values, x => x.AssemblyName.Name == "netstandard");
@@ -63,7 +65,7 @@ namespace AsmSpy.Core.Tests
         public void AnalyzeShouldReturnDependencies()
         {
             var exampleClass = new ExampleClass();
-            var result = sut.Analyze(logger);
+            var result = DependencyAnalyzer.Analyze(filesToAnalyse, null, logger, options);
 
             var tests = result.Assemblies.Values.Single(x => x.AssemblyName.Name == "AsmSpy.Core.Tests");
 
@@ -79,7 +81,7 @@ namespace AsmSpy.Core.Tests
         [Fact]
         public void AnalyzeShouldReturnCorrectAssemblySource()
         {
-            var result = sut.Analyze(logger);
+            var result = DependencyAnalyzer.Analyze(filesToAnalyse, null, logger, options);
 
             var tests = result.Assemblies.Values.Single(x => x.AssemblyName.Name == "AsmSpy.Core.Tests");
 

@@ -15,7 +15,7 @@ namespace AsmSpy.CommandLine
         private const ConsoleColor AssemblyGlobalAssemblyCacheColor = ConsoleColor.Yellow;
         private const ConsoleColor AssemblyUnknownColor = ConsoleColor.Magenta;
 
-        public virtual void Visualize(IDependencyAnalyzerResult result, ILogger logger, VisualizerOptions visualizerOptions)
+        public virtual void Visualize(DependencyAnalyzerResult result, ILogger logger, VisualizerOptions visualizerOptions)
         {
             if (result.AnalyzedFiles.Count <= 0)
             {

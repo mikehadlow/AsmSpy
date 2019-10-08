@@ -11,7 +11,7 @@ namespace AsmSpy.CommandLine
     {
         private string outputFile;
 
-        public void Visualize(IDependencyAnalyzerResult result, ILogger logger, VisualizerOptions visualizerOptions)
+        public void Visualize(DependencyAnalyzerResult result, ILogger logger, VisualizerOptions visualizerOptions)
         {
             if (string.IsNullOrWhiteSpace(outputFile))
             {
@@ -37,7 +37,7 @@ namespace AsmSpy.CommandLine
             }
         }
 
-        private void WriteAssemblies(XmlWriter writer, IDependencyAnalyzerResult result, VisualizerOptions visualizerOptions)
+        private void WriteAssemblies(XmlWriter writer, DependencyAnalyzerResult result, VisualizerOptions visualizerOptions)
         {
             writer.WriteStartElement("Assemblies");
             var assemblyGroups = result.Assemblies.Values.GroupBy(x => x.RedirectedAssemblyName);

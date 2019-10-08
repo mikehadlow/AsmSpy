@@ -35,93 +35,46 @@ namespace AsmSpy.CommandLine
 
             commandLineApplication.OnExecute(() =>
             {
+                var visualizerOptions = new VisualizerOptions(
+                        skipSystem: nonsystem.HasValue(),
+                        onlyConflicts: !all.HasValue(),
+                        referencedStartsWith: referencedStartsWith.HasValue() ? referencedStartsWith.Value() : string.Empty
+                    );
 
                 var consoleLogger = new ConsoleLogger(!silent.HasValue());
 
-                var directoryOrFilePath = directoryOrFile.Value;
-                var directoryPath = directoryOrFile.Value;
+                var finalResult = GetFileList(directoryOrFile, includeSubDirectories, consoleLogger)
+                    .Bind(fileList => GetAppDomainWithBindingRedirects(configurationFile)
+                        .Map(appDomain => DependencyAnalyzer.Analyze(
+                            fileList,
+                            appDomain,
+                            consoleLogger,
+                            visualizerOptions)))
+                    .Map(result => RunVisualizers(result, consoleLogger, visualizerOptions))
+                    .Bind(FailOnMissingAssemblies);
 
-                if (!File.Exists(directoryOrFilePath) && !Directory.Exists(directoryOrFilePath))
+                switch(finalResult)
                 {
-                    consoleLogger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Directory or file: '{0}' does not exist.", directoryOrFilePath));
-                    return -1;
+                    case Failure<bool> fail:
+                        consoleLogger.LogError(fail.Message);
+                        return -1;
+                    case Success<bool> succeed:
+                        return 0;
+                    default:
+                        throw new InvalidOperationException("Unexpected result type");
                 }
 
-                var configurationFilePath = configurationFile.Value();
-                if (!string.IsNullOrEmpty(configurationFilePath) && !File.Exists(configurationFilePath))
+                DependencyAnalyzerResult RunVisualizers(DependencyAnalyzerResult dependencyAnalyzerResult, ILogger logger, VisualizerOptions options)
                 {
-                    consoleLogger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Directory or file: '{0}' does not exist.", configurationFilePath));
-                    return -1;
-                }
-
-                var isFilePathProvided = false;
-                var fileName = "";
-                if (File.Exists(directoryOrFilePath))
-                {
-                    isFilePathProvided = true;
-                    fileName = Path.GetFileName(directoryOrFilePath);
-                    directoryPath = Path.GetDirectoryName(directoryOrFilePath);
-                }
-
-                var onlyConflicts = !all.HasValue();
-                var skipSystem = nonsystem.HasValue();
-                var searchPattern = includeSubDirectories.HasValue() ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
-
-                var visualizerOptions = new VisualizerOptions(
-                        skipSystem,
-                        onlyConflicts,
-                        referencedStartsWith.HasValue() ? referencedStartsWith.Value() : string.Empty
-                    );
-
-                var directoryInfo = new DirectoryInfo(directoryPath);
-
-                List<FileInfo> fileList;
-                if (isFilePathProvided)
-                {
-                    fileList = directoryInfo.GetFiles(fileName, SearchOption.TopDirectoryOnly).ToList();
-                    consoleLogger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Check assemblies referenced in: {0}", directoryOrFilePath));
-                }
-                else
-                {
-                    fileList = directoryInfo.GetFiles("*.dll", searchPattern).Concat(directoryInfo.GetFiles("*.exe", searchPattern)).ToList();
-                    consoleLogger.LogMessage(string.Format(CultureInfo.InvariantCulture, "Check assemblies in: {0}", directoryInfo));
-                }
-
-                AppDomain appDomainWithBindingRedirects = null;
-                try
-                {
-                    var domaininfo = new AppDomainSetup
+                    foreach(var visualizer in dependencyVisualizers.Where(x => x.IsConfigured()))
                     {
-                        ConfigurationFile = configurationFilePath
-                    };
-                    appDomainWithBindingRedirects = AppDomain.CreateDomain("AppDomainWithBindingRedirects", null, domaininfo);
-                }
-                catch (Exception ex)
-                {
-                    consoleLogger.LogError($"Failed creating AppDomain from configuration file with message {ex.Message}");
-                    return -1;
+                        visualizer.Visualize(dependencyAnalyzerResult, logger, options);
+                    }
+                    return dependencyAnalyzerResult;
                 }
 
-                // IDependencyAnalyzer seems to be pointless polymorphism, and there's no logic to the
-                // separation between constructor arguments and the argument to Analyze(..)
-                IDependencyAnalyzer analyzer = new DependencyAnalyzer(fileList, appDomainWithBindingRedirects)
-                {
-                    SkipSystem = skipSystem,
-                    ReferencedStartsWith = referencedStartsWith.HasValue() ? referencedStartsWith.Value() : string.Empty
-                };
-                var result = analyzer.Analyze(consoleLogger);
-
-                foreach(var visualizer in dependencyVisualizers.Where(x => x.IsConfigured()))
-                {
-                    visualizer.Visualize(result, consoleLogger, visualizerOptions);
-                }
-
-                if (failOnMissing.HasValue() && result.MissingAssemblies.Any())
-                {
-                    return -1;
-                }
-
-                return 0;
+                Result<bool> FailOnMissingAssemblies(DependencyAnalyzerResult dependencyAnalyzerResult)
+                    => failOnMissing.HasValue() && dependencyAnalyzerResult.MissingAssemblies.Any() ? "Missing Assemblies" : Result<bool>.Succeed(true); 
             });
 
             try
@@ -143,6 +96,51 @@ namespace AsmSpy.CommandLine
             catch (Exception)
             {
                 return -1;
+            }
+        }
+
+        private static Result<List<FileInfo>> GetFileList(CommandArgument directoryOrFile, CommandOption includeSubDirectories, ILogger logger)
+        {
+            var searchPattern = includeSubDirectories.HasValue() ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
+            var directoryOrFilePath = directoryOrFile.Value;
+            var directoryPath = Path.GetDirectoryName(directoryOrFilePath);
+
+            if (!File.Exists(directoryOrFilePath) && !Directory.Exists(directoryOrFilePath))
+            {
+                return (string.Format(CultureInfo.InvariantCulture, "Directory or file: '{0}' does not exist.", directoryOrFilePath));
+            }
+
+            if (File.Exists(directoryOrFilePath))
+            {
+                var fileName = Path.GetFileName(directoryOrFilePath);
+                logger.LogMessage($"Root assembly specified: '{fileName}'");
+            }
+
+            var directoryInfo = new DirectoryInfo(directoryPath);
+
+            logger.LogMessage($"Checking for local assemblies in: '{directoryInfo}', {searchPattern}");
+            return directoryInfo.GetFiles("*.dll", searchPattern).Concat(directoryInfo.GetFiles("*.exe", searchPattern)).ToList();
+        }
+
+        public static Result<AppDomain> GetAppDomainWithBindingRedirects(CommandOption configurationFile)
+        {
+            var configurationFilePath = configurationFile.Value();
+            if (!string.IsNullOrEmpty(configurationFilePath) && !File.Exists(configurationFilePath))
+            {
+                return $"Directory or file: '{configurationFilePath}' does not exist.";
+            }
+
+            try
+            {
+                var domaininfo = new AppDomainSetup
+                {
+                    ConfigurationFile = configurationFilePath
+                };
+                return AppDomain.CreateDomain("AppDomainWithBindingRedirects", null, domaininfo);
+            }
+            catch (Exception ex)
+            {
+                return $"Failed creating AppDomain from configuration file with message {ex.Message}";
             }
         }
 
