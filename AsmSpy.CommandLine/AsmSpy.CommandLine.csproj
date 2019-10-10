@@ -64,6 +64,7 @@
     </Compile>
     <Compile Include="BindingRedirectExport.cs" />
     <Compile Include="ConsoleLogger.cs" />
+    <Compile Include="ConsoleTreeVisualizer.cs" />
     <Compile Include="ConsoleVisualizer.cs" />
     <Compile Include="DgmlExport.cs" />
     <Compile Include="DotExport.cs" />

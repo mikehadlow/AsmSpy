@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -16,11 +17,18 @@ namespace AsmSpy.Core
         public virtual ICollection<IAssemblyReferenceInfo> ReferencedBy => _referencedBy.ToArray();
         public virtual ICollection<IAssemblyReferenceInfo> References => _references.ToArray();
         public bool IsSystem => AssemblyInformationProvider.IsSystemAssembly(AssemblyName);
+        public string FileName { get; }
+        public bool ReferencedByRoot { get; set; } = false;
+        public AssemblyReferenceInfo AlternativeFoundVersion { get; private set; }
 
-        public AssemblyReferenceInfo(AssemblyName assemblyName, AssemblyName redirectedAssemblyName)
+        public AssemblyReferenceInfo(AssemblyName assemblyName, AssemblyName redirectedAssemblyName, string fileName = "")
         {
-            AssemblyName = assemblyName;
-            RedirectedAssemblyName = redirectedAssemblyName;
+            AssemblyName = assemblyName 
+                ?? throw new ArgumentNullException(nameof(assemblyName));
+            RedirectedAssemblyName = redirectedAssemblyName 
+                ?? throw new ArgumentNullException(nameof(redirectedAssemblyName));
+            FileName = fileName 
+                ?? throw new ArgumentNullException(nameof(fileName));
         }
 
         public virtual void AddReference(IAssemblyReferenceInfo info)
@@ -37,6 +45,26 @@ namespace AsmSpy.Core
             {
                 _referencedBy.Add(info);
             }
+        }
+
+        public void SetAlternativeFoundVersion(AssemblyReferenceInfo alternativeVersion)
+        {
+            if(alternativeVersion.AssemblyName.Name != AssemblyName.Name)
+            {
+                throw new InvalidOperationException(
+                    $"Alternative version to {AssemblyName.Name}, must have the same Name, but is {alternativeVersion.AssemblyName.Name}");
+            }
+            if(ReflectionOnlyAssembly != null)
+            {
+                throw new InvalidOperationException(
+                    $"AssemblyReferenceInfo for {AssemblyName.Name} has a ReflectionOnlyAssembly, so an alternative should not be set.");
+            }
+            if(AssemblySource != AssemblySource.NotFound)
+            {
+                throw new InvalidOperationException(
+                    $"AssemblyReferenceInfo.AssemblySource for {AssemblyName.Name} is not 'NotFound', so an alternative should not be set.");
+            }
+            AlternativeFoundVersion = alternativeVersion;
         }
 
         public override int GetHashCode()

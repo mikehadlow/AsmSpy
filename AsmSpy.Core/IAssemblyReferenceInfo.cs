@@ -13,5 +13,8 @@ namespace AsmSpy.Core
         bool IsSystem { get; }
         void AddReference(IAssemblyReferenceInfo info);
         void AddReferencedBy(IAssemblyReferenceInfo info);
+        string FileName { get; }
+        bool ReferencedByRoot { get; set; }
+        AssemblyReferenceInfo AlternativeFoundVersion { get; }
     }
 }

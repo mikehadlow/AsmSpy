@@ -35,46 +35,57 @@ namespace AsmSpy.CommandLine
 
             commandLineApplication.OnExecute(() =>
             {
-                var visualizerOptions = new VisualizerOptions(
-                        skipSystem: nonsystem.HasValue(),
-                        onlyConflicts: !all.HasValue(),
-                        referencedStartsWith: referencedStartsWith.HasValue() ? referencedStartsWith.Value() : string.Empty
-                    );
-
-                var consoleLogger = new ConsoleLogger(!silent.HasValue());
-
-                var finalResult = GetFileList(directoryOrFile, includeSubDirectories, consoleLogger)
-                    .Bind(fileList => GetAppDomainWithBindingRedirects(configurationFile)
-                        .Map(appDomain => DependencyAnalyzer.Analyze(
-                            fileList,
-                            appDomain,
-                            consoleLogger,
-                            visualizerOptions)))
-                    .Map(result => RunVisualizers(result, consoleLogger, visualizerOptions))
-                    .Bind(FailOnMissingAssemblies);
-
-                switch(finalResult)
+                try
                 {
-                    case Failure<bool> fail:
-                        consoleLogger.LogError(fail.Message);
-                        return -1;
-                    case Success<bool> succeed:
-                        return 0;
-                    default:
-                        throw new InvalidOperationException("Unexpected result type");
-                }
+                    var visualizerOptions = new VisualizerOptions(
+                            skipSystem: nonsystem.HasValue(),
+                            onlyConflicts: !all.HasValue(),
+                            referencedStartsWith: referencedStartsWith.HasValue() ? referencedStartsWith.Value() : string.Empty
+                        );
 
-                DependencyAnalyzerResult RunVisualizers(DependencyAnalyzerResult dependencyAnalyzerResult, ILogger logger, VisualizerOptions options)
-                {
-                    foreach(var visualizer in dependencyVisualizers.Where(x => x.IsConfigured()))
+                    var consoleLogger = new ConsoleLogger(!silent.HasValue());
+
+                    var finalResult = GetFileList(directoryOrFile, includeSubDirectories, consoleLogger)
+                        .Bind(x => GetAppDomainWithBindingRedirects(configurationFile)
+                            .Map(appDomain => DependencyAnalyzer.Analyze(
+                                x.FileList,
+                                appDomain,
+                                consoleLogger,
+                                visualizerOptions,
+                                x.RootFileName)))
+                        .Map(result => RunVisualizers(result, consoleLogger, visualizerOptions))
+                        .Bind(FailOnMissingAssemblies);
+
+                    switch (finalResult)
                     {
-                        visualizer.Visualize(dependencyAnalyzerResult, logger, options);
+                        case Failure<bool> fail:
+                            consoleLogger.LogError(fail.Message);
+                            return -1;
+                        case Success<bool> succeed:
+                            return 0;
+                        default:
+                            throw new InvalidOperationException("Unexpected result type");
                     }
-                    return dependencyAnalyzerResult;
-                }
 
-                Result<bool> FailOnMissingAssemblies(DependencyAnalyzerResult dependencyAnalyzerResult)
-                    => failOnMissing.HasValue() && dependencyAnalyzerResult.MissingAssemblies.Any() ? "Missing Assemblies" : Result<bool>.Succeed(true); 
+                    DependencyAnalyzerResult RunVisualizers(DependencyAnalyzerResult dependencyAnalyzerResult, ILogger logger, VisualizerOptions options)
+                    {
+                        foreach (var visualizer in dependencyVisualizers.Where(x => x.IsConfigured()))
+                        {
+                            visualizer.Visualize(dependencyAnalyzerResult, logger, options);
+                        }
+                        return dependencyAnalyzerResult;
+                    }
+
+                    Result<bool> FailOnMissingAssemblies(DependencyAnalyzerResult dependencyAnalyzerResult)
+                        => failOnMissing.HasValue() && dependencyAnalyzerResult.MissingAssemblies.Any()
+                            ? "Missing Assemblies"
+                            : Result<bool>.Succeed(true);
+                }
+                catch(Exception exception)
+                {
+                    Console.WriteLine(exception.ToString());
+                    return -1;
+                }
             });
 
             try
@@ -99,27 +110,32 @@ namespace AsmSpy.CommandLine
             }
         }
 
-        private static Result<List<FileInfo>> GetFileList(CommandArgument directoryOrFile, CommandOption includeSubDirectories, ILogger logger)
+        private static Result<(List<FileInfo> FileList, string RootFileName)> GetFileList(CommandArgument directoryOrFile, CommandOption includeSubDirectories, ILogger logger)
         {
             var searchPattern = includeSubDirectories.HasValue() ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
             var directoryOrFilePath = directoryOrFile.Value;
-            var directoryPath = Path.GetDirectoryName(directoryOrFilePath);
+            var directoryPath = directoryOrFilePath;
 
             if (!File.Exists(directoryOrFilePath) && !Directory.Exists(directoryOrFilePath))
             {
                 return (string.Format(CultureInfo.InvariantCulture, "Directory or file: '{0}' does not exist.", directoryOrFilePath));
             }
 
+            var rootFileName = "";
             if (File.Exists(directoryOrFilePath))
             {
-                var fileName = Path.GetFileName(directoryOrFilePath);
-                logger.LogMessage($"Root assembly specified: '{fileName}'");
+                rootFileName = Path.GetFileName(directoryOrFilePath);
+                logger.LogMessage($"Root assembly specified: '{rootFileName}'");
+                directoryPath = Path.GetDirectoryName(directoryOrFilePath);
             }
 
             var directoryInfo = new DirectoryInfo(directoryPath);
 
             logger.LogMessage($"Checking for local assemblies in: '{directoryInfo}', {searchPattern}");
-            return directoryInfo.GetFiles("*.dll", searchPattern).Concat(directoryInfo.GetFiles("*.exe", searchPattern)).ToList();
+
+            var fileList = directoryInfo.GetFiles("*.dll", searchPattern).Concat(directoryInfo.GetFiles("*.exe", searchPattern)).ToList();
+
+            return (fileList, rootFileName);
         }
 
         public static Result<AppDomain> GetAppDomainWithBindingRedirects(CommandOption configurationFile)
@@ -147,6 +163,7 @@ namespace AsmSpy.CommandLine
         private static IDependencyVisualizer[] GetDependencyVisualizers() => new IDependencyVisualizer[]
         {
             new ConsoleVisualizer(),
+            new ConsoleTreeVisualizer(),
             new DgmlExport(),
             new XmlExport(),
             new DotExport(),

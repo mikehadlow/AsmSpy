@@ -14,8 +14,8 @@ namespace AsmSpy.Core.Tests
         private readonly ITestOutputHelper output;
         private readonly TestLogger logger;
 
-        private IEnumerable<FileInfo> filesToAnalyse;
-        private VisualizerOptions options = new VisualizerOptions(false, false, "");
+        private readonly IEnumerable<FileInfo> filesToAnalyse;
+        private readonly VisualizerOptions options = new VisualizerOptions(false, false, "");
 
         public DependencyAnalyzerTests(ITestOutputHelper output)
         {
