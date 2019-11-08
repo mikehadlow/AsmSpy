@@ -32,7 +32,7 @@ namespace AsmSpy.Core
             MapAssemblyReferences(result, appDomainWithBindingRedirects, options);
             ResolveNonFileReferences(result, logger);
             FindRootAssemblies(result, logger, rootFileName);
-            MarkRefernecedAssemblies(result);
+            MarkReferencedAssemblies(result);
 
             return result;
         }
@@ -171,7 +171,7 @@ namespace AsmSpy.Core
             }
         }
 
-        private static void MarkRefernecedAssemblies(DependencyAnalyzerResult result)
+        private static void MarkReferencedAssemblies(DependencyAnalyzerResult result)
         {
             foreach(var assembly in result.Roots)
             {
@@ -180,6 +180,11 @@ namespace AsmSpy.Core
             
             void WalkAndMark(IAssemblyReferenceInfo assembly)
             {
+                if (assembly.ReferencedByRoot)
+                {
+                    return;
+                }
+
                 assembly.ReferencedByRoot = true;
                 foreach(var dependency in assembly.References)
                 {
