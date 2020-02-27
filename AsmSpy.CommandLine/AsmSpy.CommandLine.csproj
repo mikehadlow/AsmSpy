@@ -65,6 +65,7 @@
     <Compile Include="BindingRedirectExport.cs" />
     <Compile Include="ConsoleLogger.cs" />
     <Compile Include="ConsoleTreeVisualizer.cs" />
+    <Compile Include="ConsoleUnreferencedAssembliesVisualizer.cs" />
     <Compile Include="ConsoleVisualizer.cs" />
     <Compile Include="DgmlExport.cs" />
     <Compile Include="DotExport.cs" />
@@ -90,6 +91,7 @@
     <EmbeddedResource Include="AsmSpy.CommandLine.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>AsmSpy.CommandLine.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -167,7 +167,8 @@ namespace AsmSpy.CommandLine
             new DgmlExport(),
             new XmlExport(),
             new DotExport(),
-            new BindingRedirectExport()
+            new BindingRedirectExport(),
+			new ConsoleUnreferencedAssembliesVisualizer(), 
         };
     }
 }
