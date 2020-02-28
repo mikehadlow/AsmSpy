@@ -123,7 +123,9 @@ namespace AsmSpy.CommandLine
             if (xml.HasValue())
             {
                 outputFile = xml.Value();
+                return true;
             }
+
             return false;
         }
     }
