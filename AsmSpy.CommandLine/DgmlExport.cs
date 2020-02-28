@@ -21,10 +21,12 @@ namespace AsmSpy.CommandLine
         private string _exportFileName;
 
         private CommandOption dgmlExport;
+        private CommandOption showVersion;
 
         public void CreateOption(CommandLineApplication commandLineApplication)
         {
             dgmlExport = commandLineApplication.Option("-dg|--dgml <filename>", "Export to a dgml file", CommandOptionType.SingleValue);
+            showVersion = commandLineApplication.Option("-dgsv|--dgshowversion", "Show the assembly version on the label", CommandOptionType.NoValue);
         }
 
         public bool IsConfigured()
@@ -56,7 +58,8 @@ namespace AsmSpy.CommandLine
                         if (visualizerOptions.SkipSystem && assemblyReference.IsSystem)
                             continue;
 
-                        dgml.WriteLine(Invariant($@"<Node Id=""{assemblyReference.AssemblyName.FullName}"" Label=""{assemblyReference.AssemblyName.Name}"" Category=""Assembly"">"));
+                        var label = !showVersion.HasValue() ? assemblyReference.AssemblyName.Name : $"{assemblyReference.AssemblyName.Name}&#13;{ assemblyReference.AssemblyName.Version}";
+                        dgml.WriteLine(Invariant($@"<Node Id=""{assemblyReference.AssemblyName.FullName}"" Label=""{label}"" Category=""Assembly"">"));
                         dgml.WriteLine(Invariant($@"<Category Ref=""{assemblyReference.AssemblySource}"" />"));
                         dgml.WriteLine(@"</Node>");
                     }
