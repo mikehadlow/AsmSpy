@@ -29,6 +29,7 @@ It will output a list of all conflicting assembly references. That is where diff
 | noconsole | Do not show reference output on console.<br> Supported formats:  -nc, --noconsole |
 | silent | Do not show any output, only warnings and errors will be shown.<br> Supported formats:  -s, --silent |
 | dgml | Export dependency graph to a dgml file.<br> Supported formats:  -dg \<filename\> |
+| dgml version | Show the assembly version on the label.<br> Supported formats:  -dgsv, --dgshowversion  |
 | dot | Export dependency graph to a [DOT](https://en.wikipedia.org/wiki/DOT_(graph_description_language)) file.<br> Supported formats:  -dt \<filename\> |
 | xml | Export dependency graph to a xml file.<br> Supported formats:  -x \<filename\> |
 | rsw | Will only analyze assemblies if their referenced assemblies starts with the given value.<br> Supported formats:  -rsw \<string\>, --referencedstartswith \<string\> |
