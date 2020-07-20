@@ -106,7 +106,7 @@ namespace AsmSpy.Core
             {
                 try
                 {
-                    assembly.ReflectionOnlyAssembly = Assembly.ReflectionOnlyLoad(assembly.AssemblyName.FullName);
+                    assembly.ReflectionOnlyAssembly = Assembly.ReflectionOnlyLoad(assembly.RedirectedAssemblyName?.FullName ?? assembly.AssemblyName.FullName);
                     assembly.AssemblySource = assembly.ReflectionOnlyAssembly.GlobalAssemblyCache
                         ? AssemblySource.GlobalAssemblyCache
                         : AssemblySource.Unknown;
