@@ -20,6 +20,7 @@ namespace AsmSpy.Core
         public string FileName { get; }
         public bool ReferencedByRoot { get; set; } = false;
         public AssemblyReferenceInfo AlternativeFoundVersion { get; private set; }
+        public bool HasAlternativeVersion => AlternativeFoundVersion != null;
 
         public AssemblyReferenceInfo(AssemblyName assemblyName, AssemblyName redirectedAssemblyName, string fileName = "")
         {

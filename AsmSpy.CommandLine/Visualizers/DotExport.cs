@@ -1,8 +1,10 @@
 ﻿using AsmSpy.Core;
+
 using Microsoft.Extensions.CommandLineUtils;
+
 using System.IO;
 
-namespace AsmSpy.CommandLine
+namespace AsmSpy.CommandLine.Visualizers
 {
     public class DotExport : IDependencyVisualizer
     {

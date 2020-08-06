@@ -61,6 +61,15 @@ namespace AsmSpy.CommandLine {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to  (AlternativeVersionFound).
+        /// </summary>
+        internal static string AlternativeVersionFound {
+            get {
+                return ResourceManager.GetString("AlternativeVersionFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to  by .
         /// </summary>
         internal static string by {

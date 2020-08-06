@@ -1,5 +1,8 @@
+using AsmSpy.CommandLine.Visualizers;
 using AsmSpy.Core;
+
 using Microsoft.Extensions.CommandLineUtils;
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -20,13 +23,14 @@ namespace AsmSpy.CommandLine
             var nonsystem = commandLineApplication.Option("-n|--nonsystem", "Ignore 'System' assemblies", CommandOptionType.NoValue);
             var all = commandLineApplication.Option("-a|--all", "List all assemblies and references.", CommandOptionType.NoValue);
             var referencedStartsWith = commandLineApplication.Option("-rsw|--referencedstartswith", "Referenced Assembly should start with <string>. Will only analyze assemblies if their referenced assemblies starts with the given value.", CommandOptionType.SingleValue);
+            var excludeAssemblies = commandLineApplication.Option("-e|--exclude", "A partial assembly name which should be excluded. This option can be provided multiple times", CommandOptionType.MultipleValue);
 
             var includeSubDirectories = commandLineApplication.Option("-i|--includesub", "Include subdirectories in search", CommandOptionType.NoValue);
             var configurationFile = commandLineApplication.Option("-c|--configurationFile", "Use the binding redirects of the given configuration file (Web.config or App.config)", CommandOptionType.SingleValue);
             var failOnMissing = commandLineApplication.Option("-f|--failOnMissing", "Whether to exit with an error code when AsmSpy detected Assemblies which could not be found", CommandOptionType.NoValue);
 
             var dependencyVisualizers = GetDependencyVisualizers();
-            foreach(var visualizer in dependencyVisualizers)
+            foreach (var visualizer in dependencyVisualizers)
             {
                 visualizer.CreateOption(commandLineApplication);
             }
@@ -37,11 +41,13 @@ namespace AsmSpy.CommandLine
             {
                 try
                 {
-                    var visualizerOptions = new VisualizerOptions(
-                            skipSystem: nonsystem.HasValue(),
-                            onlyConflicts: !all.HasValue(),
-                            referencedStartsWith: referencedStartsWith.HasValue() ? referencedStartsWith.Value() : string.Empty
-                        );
+                    var visualizerOptions = new VisualizerOptions
+                    {
+                        SkipSystem = nonsystem.HasValue(),
+                        OnlyConflicts = !all.HasValue(),
+                        ReferencedStartsWith = referencedStartsWith.HasValue() ? referencedStartsWith.Value() : string.Empty,
+                        Exclude = excludeAssemblies.HasValue() ? excludeAssemblies.Values : new List<string>()
+                    };
 
                     var consoleLogger = new ConsoleLogger(!silent.HasValue());
 
@@ -81,7 +87,7 @@ namespace AsmSpy.CommandLine
                             ? "Missing Assemblies"
                             : Result<bool>.Succeed(true);
                 }
-                catch(Exception exception)
+                catch (Exception exception)
                 {
                     Console.WriteLine(exception.ToString());
                     return -1;

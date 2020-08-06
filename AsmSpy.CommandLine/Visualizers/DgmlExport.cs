@@ -1,12 +1,15 @@
-﻿using System;
+﻿using AsmSpy.Core;
+
+using Microsoft.Extensions.CommandLineUtils;
+
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using AsmSpy.Core;
-using Microsoft.Extensions.CommandLineUtils;
+
 using static System.FormattableString;
 
-namespace AsmSpy.CommandLine
+namespace AsmSpy.CommandLine.Visualizers
 {
     public class DgmlExport : IDependencyVisualizer
     {

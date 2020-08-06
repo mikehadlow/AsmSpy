@@ -9,7 +9,8 @@ namespace AsmSpy.Core
     {
         public ICollection<FileInfo> AnalyzedFiles { get; }
         public IDictionary<string, AssemblyReferenceInfo> Assemblies { get; }
-        public IEnumerable<AssemblyReferenceInfo> MissingAssemblies => Assemblies.Where(x => x.Value.AssemblySource == AssemblySource.NotFound).Select(x => x.Value);
+        public IEnumerable<AssemblyReferenceInfo> MissingAssemblies => Assemblies.Select(x => x.Value).Where(IsNotFound);
+
         public IEnumerable<AssemblyReferenceInfo> Roots => roots;
 
         private IList<AssemblyReferenceInfo> roots;
@@ -26,5 +27,10 @@ namespace AsmSpy.Core
         }
 
         public void AddRoot(AssemblyReferenceInfo root) => roots.Add(root);
+
+        private static bool IsNotFound(AssemblyReferenceInfo assemblyInfo)
+        {
+            return assemblyInfo.AssemblySource == AssemblySource.NotFound && !assemblyInfo.HasAlternativeVersion;
+        }
     }
 }
