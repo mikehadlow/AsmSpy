@@ -1,11 +1,13 @@
-﻿using System;
+﻿using AsmSpy.Core.TestLibrary;
+
+using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.IO;
+
 using Xunit;
 using Xunit.Abstractions;
-using AsmSpy.Core.TestLibrary;
-using System.Collections.Generic;
 
 namespace AsmSpy.Core.Tests
 {
@@ -15,7 +17,7 @@ namespace AsmSpy.Core.Tests
         private readonly TestLogger logger;
 
         private readonly IEnumerable<FileInfo> filesToAnalyse;
-        private readonly VisualizerOptions options = new VisualizerOptions(false, false, "");
+        private readonly VisualizerOptions options = new VisualizerOptions();
 
         public DependencyAnalyzerTests(ITestOutputHelper output)
         {
@@ -53,7 +55,10 @@ namespace AsmSpy.Core.Tests
         [Fact]
         public void AnalyzeShouldNotReturnSystemAssembliesWhenFlagIsSet()
         {
-            var altOptions = new VisualizerOptions(true, false, "");
+            var altOptions = new VisualizerOptions
+            {
+                SkipSystem = true
+            };
             var result = DependencyAnalyzer.Analyze(filesToAnalyse, null, logger, altOptions);
 
             Assert.DoesNotContain(result.Assemblies.Values, x => x.AssemblyName.Name == "mscorlib");

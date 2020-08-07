@@ -7,6 +7,6 @@ namespace AsmSpy.Core
         public bool SkipSystem { get; set; }
         public bool OnlyConflicts { get; set; }
         public string ReferencedStartsWith { get; set; }
-        public IList<string> Exclude { get; set; }
+        public IList<string> Exclude { get; set; } = new List<string>();
     }
 }
