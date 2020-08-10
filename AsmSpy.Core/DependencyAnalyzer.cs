@@ -1,4 +1,5 @@
 using AsmSpy.Core.Native;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -99,7 +100,7 @@ namespace AsmSpy.Core
         }
 
         private static void ResolveNonFileReferences(
-            DependencyAnalyzerResult result, 
+            DependencyAnalyzerResult result,
             ILogger logger) 
         {
             foreach (var assembly in result.Assemblies.Values.Where(x => x.ReflectionOnlyAssembly == null).OrderBy(x => x.AssemblyName.Name))
@@ -117,7 +118,7 @@ namespace AsmSpy.Core
                 {
                     var alternativeVersion = result.Assemblies.Values
                         .Where(x => x.AssemblyName.Name == assembly.AssemblyName.Name)
-                        .Where(x => x.ReflectionOnlyAssembly != null)
+                        .Where(x => x.ReflectionOnlyAssembly != null)   
                         .SingleOrDefault();
 
                     if(alternativeVersion != null)
@@ -207,6 +208,11 @@ namespace AsmSpy.Core
 
             if (!string.IsNullOrEmpty(options.ReferencedStartsWith) && 
                 !assemblyName.FullName.StartsWith(options.ReferencedStartsWith, StringComparison.OrdinalIgnoreCase))
+            {
+                return null;
+            }
+
+            if (options.Exclude.Any(e => assemblyName.FullName.StartsWith(e, StringComparison.OrdinalIgnoreCase)))
             {
                 return null;
             }

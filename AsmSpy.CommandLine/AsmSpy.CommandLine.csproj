@@ -64,16 +64,16 @@
     </Compile>
     <Compile Include="BindingRedirectExport.cs" />
     <Compile Include="ConsoleLogger.cs" />
-    <Compile Include="ConsoleTreeVisualizer.cs" />
-    <Compile Include="ConsoleVisualizer.cs" />
-    <Compile Include="DgmlExport.cs" />
-    <Compile Include="DotExport.cs" />
+    <Compile Include="Visualizers\ConsoleTreeVisualizer.cs" />
+    <Compile Include="Visualizers\ConsoleVisualizer.cs" />
+    <Compile Include="Visualizers\DgmlExport.cs" />
+    <Compile Include="Visualizers\DotExport.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="IDependencyVisualizer.cs" />
+    <Compile Include="Visualizers\IDependencyVisualizer.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utilities\XmlWriterElementScope.cs" />
-    <Compile Include="XmlExport.cs" />
+    <Compile Include="Visualizers\XmlExport.cs" />
     <Compile Include="Utilities\XmlWriterExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -90,8 +90,10 @@
     <EmbeddedResource Include="AsmSpy.CommandLine.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>AsmSpy.CommandLine.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <NuGetPackagesPath>$(SolutionDir)\packages</NuGetPackagesPath>

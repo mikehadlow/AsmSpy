@@ -1,11 +1,15 @@
-﻿using System;
+﻿using AsmSpy.CommandLine.Visualizers;
+using AsmSpy.Core;
+
+using Microsoft.Extensions.CommandLineUtils;
+
+using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Xml;
-using AsmSpy.Core;
-using Microsoft.Extensions.CommandLineUtils;
+
 using static System.FormattableString;
 
 namespace AsmSpy.CommandLine

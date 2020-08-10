@@ -150,4 +150,7 @@
   <data name="ConsoleVisualizer_Visualize__0_" xml:space="preserve">
     <value>{0}</value>
   </data>
+  <data name="AlternativeVersionFound" xml:space="preserve">
+    <value> (AlternativeVersionFound)</value>
+  </data>
 </root>

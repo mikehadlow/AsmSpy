@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml;
 
-namespace AsmSpy.CommandLine
+namespace AsmSpy.CommandLine.Utilities
 {
     public sealed class XmlWriterElementScope : IDisposable
     {
