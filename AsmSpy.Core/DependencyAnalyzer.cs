@@ -119,7 +119,7 @@ namespace AsmSpy.Core
                     var alternativeVersion = result.Assemblies.Values
                         .Where(x => x.AssemblyName.Name == assembly.AssemblyName.Name)
                         .Where(x => x.ReflectionOnlyAssembly != null)   
-                        .SingleOrDefault();
+                        .FirstOrDefault();
 
                     if(alternativeVersion != null)
                     {
