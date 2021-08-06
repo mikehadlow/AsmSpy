@@ -135,6 +135,11 @@ namespace AsmSpy.Core
                         assembly.AssemblySource = AssemblySource.NotFound;
                     }
                 }
+                catch (FileLoadException)
+                {
+                    logger.LogError($"Failed to load {assembly.AssemblyName.Name} {assembly.AssemblyName.Version.ToString()}");
+                    assembly.AssemblySource = AssemblySource.NotFound;
+                }
             }
         }
 
