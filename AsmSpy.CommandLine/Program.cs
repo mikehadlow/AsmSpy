@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace AsmSpy.CommandLine
 {
@@ -15,6 +16,8 @@ namespace AsmSpy.CommandLine
     {
         public static int Main(string[] args)
         {
+            Console.OutputEncoding = Encoding.Unicode;
+
             var commandLineApplication = new CommandLineApplication(throwOnUnexpectedArg: true);
             var directoryOrFile = commandLineApplication.Argument("directoryOrFile", "The directory to search for assemblies or file path to a single assembly");
 

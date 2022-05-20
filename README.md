@@ -35,6 +35,8 @@ It will output a list of all conflicting assembly references. That is where diff
 | rsw | Will only analyze assemblies if their referenced assemblies starts with the given value.<br> Supported formats:  -rsw \<string\>, --referencedstartswith \<string\> |
 | e | Will exclude assemblies if they start with the given value. This option can be provided multiple times.<br> Supported formats:  -e \<string\>, --exclude \<string\> |
 | tree | Write a dependency tree to the console.<br>Supported formats: -tr --tree |
+| treedepth | Limit tree depth (in compbinaison with --tree). Supported formats : -trd \<int\> --treedepth \<int\> |
+| treelabel | Add [Level n] label in tree view of dependencies. Supported formats -trl --treelabel |
 | i | Include subdirectories in search.<br> Supported formats:  -i, --includesub |
 | c | Use the binding redirects of the given configuration file (Web.config or App.config) <br> Supported formats: -c \<string>, --configurationFile \<string> |
 | f | Whether to exit with an error code when AsmSpy detected Assemblies which could not be found <br> Supported formats. -f, --failOnMissing |

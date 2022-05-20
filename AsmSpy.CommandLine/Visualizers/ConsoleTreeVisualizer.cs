@@ -11,29 +11,70 @@ namespace AsmSpy.CommandLine.Visualizers
 {
     public class ConsoleTreeVisualizer : IDependencyVisualizer
     {
-        CommandOption noConsole;
+        private CommandOption treeOption;
+        private CommandOption treeDepthOption;
+        private CommandOption treeLabelOption;
 
         public void CreateOption(CommandLineApplication commandLineApplication)
         {
-            noConsole = commandLineApplication.Option("-tr|--tree", "Output a console tree view of dependencies.", CommandOptionType.NoValue);
+            treeOption = commandLineApplication.Option("-tr|--tree", "Output a console tree view of dependencies.", CommandOptionType.NoValue);
+            treeDepthOption = commandLineApplication.Option("-trd|--treedepth", "Limit tree depth (in compbinaison with --tree).", CommandOptionType.SingleValue);
+            treeLabelOption = commandLineApplication.Option("-trl|--treelabel", "Add [Level n] label in tree view of dependencies.", CommandOptionType.NoValue);
         }
 
-        public bool IsConfigured() => noConsole.HasValue();
+        public bool IsConfigured() => treeOption.HasValue();
+
+        private int? CalcMaxDepth()
+        {
+            if (treeDepthOption.HasValue())
+            {
+                string optionValue = treeDepthOption.Value();
+                if (!int.TryParse(optionValue, out var maxDepthValue))
+                {
+                    throw new ArgumentException("treedepth must be a int greater or equals to zero. Value: \"" + optionValue + "\"");
+                }
+                if (maxDepthValue < 0)
+                {
+                    throw new ArgumentException("treedepth must be a int greater or equals to zero. Value: \"" + optionValue + "\"");
+                }
+                return maxDepthValue;
+            }
+            return null;
+        }
+
+        private bool IsNodeLabelEnabled() => treeLabelOption.HasValue();
+
+        private void WriteTreeNodeLabel(string tab, bool lastParent, int level)
+        {
+            var label = lastParent ? endNodeLabel : nodeLabel;
+
+            Write($"{tab}{label}");
+            if (IsNodeLabelEnabled())
+            {
+                Write($"[LEVEL {level}] ");
+            }
+        }
 
         public void Visualize(DependencyAnalyzerResult result, ILogger logger, VisualizerOptions visualizerOptions)
         {
+            int? maxDepth = CalcMaxDepth();
 
-            foreach(var root in result.Roots)
+            foreach (var root in result.Roots)
             {
                 WalkDependencies(root);
             }
 
 
-            void WalkDependencies(IAssemblyReferenceInfo assembly, string tab = "", bool lastParent = true)
+            void WalkDependencies(IAssemblyReferenceInfo assembly, string tab = "", bool lastParent = true, int level = 0)
             {
-                var label = lastParent ? endNodeLabel : nodeLabel;
+                // Break if max depth is reached.
+                if (maxDepth.HasValue && level > maxDepth)
+                {
+                    return;
+                }
+
                 var currentForgroundColor = ForegroundColor;
-                Write($"{tab}{label}");
+                WriteTreeNodeLabel(tab, lastParent, level);
                 ForegroundColor = SelectConsoleColor(assembly.AssemblySource);
 
                 var alternativeVersion = assembly.AlternativeFoundVersion == null
@@ -47,15 +88,16 @@ namespace AsmSpy.CommandLine.Visualizers
 
                 var count = 1;
                 var totalChildren = assembly.References.Count();
-                foreach(var dependency in assembly.References)
+                int nextLevel = level + 1;
+                foreach (var dependency in assembly.References)
                 {
-                    if(dependency.AssemblySource == AssemblySource.GlobalAssemblyCache && visualizerOptions.SkipSystem)
+                    if (dependency.AssemblySource == AssemblySource.GlobalAssemblyCache && visualizerOptions.SkipSystem)
                     {
                         continue;
                     }
                     var parentLast = count++ == totalChildren;
                     var parentLabel = lastParent ? tabLabel : continuationLabel;
-                    WalkDependencies(dependency, tab + parentLabel, parentLast);
+                    WalkDependencies(dependency, tab + parentLabel, parentLast, nextLevel);
                 }
             }
         }
